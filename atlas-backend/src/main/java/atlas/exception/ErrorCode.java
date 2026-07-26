@@ -1,0 +1,19 @@
+package atlas.exception;
+
+
+public enum ErrorCode {
+
+    TOKEN_INVALID,
+    TOKEN_EXPIRED,
+
+    UNAUTHORIZED,
+    ACCESS_DENIED,
+
+    INVALID_CREDENTIALS,
+    EMAIL_ALREADY_EXISTS,
+
+    RESOURCE_NOT_FOUND,
+    VALIDATION_ERROR,
+    INTERNAL_SERVER_ERROR
+
+}

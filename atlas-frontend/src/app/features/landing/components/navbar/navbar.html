@@ -1,0 +1,136 @@
+<nav
+  class="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl">
+
+  <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
+
+    <a
+      (click)="scrollTo('hero')"
+      class="flex items-center gap-3 cursor-pointer">
+
+      <div
+        class="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface">
+
+        <lucide-angular
+          [img]="Wallet"
+          class="h-5 w-5 text-primary">
+        </lucide-angular>
+
+      </div>
+
+      <span class="text-xl font-bold tracking-tight text-foreground">
+        Atlas
+      </span>
+
+    </a>
+
+    <!-- Menu Desktop -->
+    <div class="hidden items-center gap-8 lg:flex">
+
+      <a
+        (click)="scrollTo('beneficios')"
+        class="text-sm font-medium text-muted transition hover:text-foreground cursor-pointer">
+        Benefícios
+      </a>
+
+      <a
+        (click)="scrollTo('recursos')"
+        class="text-sm font-medium text-muted transition hover:text-foreground cursor-pointer">
+        Recursos
+      </a>
+
+      <a
+        (click)="scrollTo('sobre')"
+        class="text-sm font-medium text-muted transition hover:text-foreground cursor-pointer">
+        Sobre
+      </a>
+
+    </div>
+
+    <div class="hidden items-center gap-3 lg:flex">
+
+      <a
+        routerLink="/login"
+        class="rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface-hover">
+
+        Entrar
+
+      </a>
+
+      <a
+        routerLink="/register"
+        class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition hover:bg-primary-hover">
+
+        Criar conta
+
+      </a>
+
+    </div>
+
+    <button
+      (click)="toggleMenu()"
+      class="rounded-xl border border-border bg-surface p-2 transition hover:bg-surface-hover lg:hidden">
+
+      <lucide-angular
+        [img]="Menu"
+        class="h-5 w-5 text-foreground">
+      </lucide-angular>
+
+    </button>
+
+  </div>
+
+  <div
+    *ngIf="menuOpen"
+    class="border-t border-border bg-background lg:hidden">
+
+    <div class="flex flex-col gap-2 p-6">
+
+      <a
+        href="#beneficios"
+        class="rounded-xl px-3 py-3 text-muted hover:bg-surface hover:text-foreground">
+        Benefícios
+      </a>
+
+      <a
+        href="#recursos"
+        class="rounded-xl px-3 py-3 text-muted hover:bg-surface hover:text-foreground">
+        Recursos
+      </a>
+
+      <a
+        href="#precos"
+        class="rounded-xl px-3 py-3 text-muted hover:bg-surface hover:text-foreground">
+        Planos
+      </a>
+
+      <a
+        href="#faq"
+        class="rounded-xl px-3 py-3 text-muted hover:bg-surface hover:text-foreground">
+        FAQ
+      </a>
+
+      <div class="mt-4 flex flex-col gap-3">
+
+        <a
+          routerLink="/login"
+          class="rounded-xl border border-border bg-surface py-3 text-center font-semibold">
+
+          Entrar
+
+        </a>
+
+        <a
+          routerLink="/register"
+          class="rounded-xl bg-primary py-3 text-center font-bold text-black hover:bg-primary-hover">
+
+          Criar conta
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</nav>

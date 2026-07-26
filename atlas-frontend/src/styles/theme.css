@@ -1,0 +1,33 @@
+@theme {
+
+    /* Cores */
+
+    --color-background: #09090B;
+
+    --color-surface: #18181A;
+
+    --color-surface-hover: #27272A;
+
+    --color-primary: #22C55E;
+
+    --color-primary-hover: #16A34A;
+
+    --color-foreground: #FFFFFF;
+
+    --color-muted: #A1A1AA;
+
+    --color-border: rgba(255, 255, 255, .08);
+
+    /* Fontes */
+
+    --font-sans: "Manrope", sans-serif;
+
+    /* Radius */
+
+    --radius-card: 16px;
+
+    --radius-button: 12px;
+
+    --radius-modal: 24px;
+
+}

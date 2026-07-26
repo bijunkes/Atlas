@@ -1,0 +1,166 @@
+<div class="pointer-events-none absolute inset-0 
+                bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)]
+                bg-[length:64px_64px]
+                [mask-image:radial-gradient(ellipse_70%_60%_at_30%_40%,black_30%,transparent_75%)]">
+</div>
+
+<div class="pointer-events-none absolute -left-36 -top-36 
+                h-[520px] w-[520px] rounded-full
+                bg-[radial-gradient(circle,rgba(34,197,94,0.16)_0%,rgba(34,197,94,0)_70%)]">
+</div>
+
+<div class="pointer-events-none absolute -left-[260px] -top-[180px]
+                h-[640px] w-[640px] rounded-full
+                border border-white/5">
+</div>
+
+<div class="pointer-events-none absolute -left-[150px] -top-[70px]
+                h-[420px] w-[420px] rounded-full
+                border border-white/[0.04]">
+</div>
+
+<main class="flex min-h-screen bg-background items-center justify-center">
+    <div class="w-full max-w-sm rounded-3xl border border-border bg-surface px-8 py-8 shadow-xl">
+
+        <div class="mb-6">
+
+            <h1 class="text-2xl font-bold tracking-tight text-foreground">
+                Entrar
+            </h1>
+
+            <p class="mt-1 text-sm text-muted">
+                Bem-vindo de volta ao Atlas.
+            </p>
+
+        </div>
+
+        <form class="space-y-4" [formGroup]="loginForm" (ngSubmit)="login()">
+
+            <div>
+
+                <label for="email" class="mb-1.5 block text-xs font-medium text-muted">
+                    E-mail
+                </label>
+
+                <div class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                    [class.border-red-500]="email?.invalid && email?.touched"
+                    [class.border-border]="!(email?.invalid && email?.touched)">
+
+                    <lucide-angular [img]="Mail" class="h-4 w-4 text-muted">
+                    </lucide-angular>
+
+                    <input id="email" name="email" type="email" formControlName="email" placeholder="voce@email.com"
+                        class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted">
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <label for="password" class="mb-1.5 block text-xs font-medium text-muted">
+                    Senha
+                </label>
+
+                <div
+                    class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                    [class.border-red-500]="senha?.invalid && senha?.touched">
+
+                    <lucide-angular [img]="Lock" class="h-4 w-4 text-muted">
+                    </lucide-angular>
+
+                    <input id="password" name="senha" formControlName="senha"
+                        [type]="passwordVisible ? 'text' : 'password'" placeholder="••••••••"
+                        class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted">
+
+                    <button type="button" (click)="passwordVisible = !passwordVisible"
+                        class="text-muted hover:text-foreground transition">
+
+                        <lucide-angular [img]="passwordVisible ? EyeOff : Eye" class="h-4 w-4">
+                        </lucide-angular>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+
+                <label class="flex items-center gap-2 text-xs text-muted cursor-pointer">
+
+                    <input type="checkbox" class="peer sr-only">
+
+                    <span
+                        class="flex h-4 w-4 items-center justify-center rounded border border-border bg-surface transition peer-checked:bg-primary peer-checked:border-primary">
+
+                        <lucide-angular [img]="Check"
+                            class="h-3 w-3 text-black scale-0 transition peer-checked:scale-100">
+                        </lucide-angular>
+
+                    </span>
+                    Lembrar de mim
+                </label>
+
+                <a routerLink="/forgot-password"
+                    class="cursor-pointer text-xs font-bold text-muted hover:text-foreground transition">
+                    Esqueceu sua senha?
+                </a>
+
+            </div>
+
+            <button type="submit"
+                class="mt-1 flex w-full items-center justify-center gap-1 rounded-xl bg-primary py-3 text-sm font-bold text-black transition hover:bg-primary-hover">
+
+                Entrar
+
+                <lucide-angular [img]="ArrowRight" class="h-4 w-4">
+                </lucide-angular>
+
+            </button>
+
+        </form>
+
+        <div class="my-5 flex items-center gap-3">
+
+            <div class="h-px flex-1 bg-border"></div>
+
+            <span class="text-[11px] uppercase tracking-wider text-muted">
+
+                ou
+
+            </span>
+
+            <div class="h-px flex-1 bg-border"></div>
+
+        </div>
+
+        <button
+            class="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-medium text-foreground transition hover:bg-surface-hover">
+
+            <svg class="h-4 w-4" viewBox="0 0 24 24">
+                <path fill="#4285F4"
+                    d="M21.35 12.27c0-.75-.07-1.47-.21-2.17H12v4.1h5.22a4.46 4.46 0 0 1-1.94 2.93v2.43h3.14c1.84-1.7 2.93-4.2 2.93-7.29z" />
+                <path fill="#34A853"
+                    d="M12 21.5c2.64 0 4.86-.88 6.48-2.39l-3.14-2.43c-.87.58-1.98.92-3.34.92-2.57 0-4.75-1.74-5.53-4.08H3.22v2.5A9.79 9.79 0 0 0 12 21.5z" />
+                <path fill="#FBBC05" d="M6.47 13.52a5.9 5.9 0 0 1 0-3.04V7.98H3.22a9.5 9.5 0 0 0 0 8.04l3.25-2.5z" />
+                <path fill="#EA4335"
+                    d="M12 6.4c1.44 0 2.73.5 3.75 1.48l2.81-2.81C16.85 3.45 14.63 2.5 12 2.5a9.79 9.79 0 0 0-8.78 5.48l3.25 2.5C7.25 8.14 9.43 6.4 12 6.4z" />
+            </svg>
+
+            Entrar com Google
+
+        </button>
+
+        <p class="mt-5 text-center text-sm text-muted">
+
+            Não possui uma conta?
+
+            <a routerLink="/register" class="cursor-pointer font-bold text-primary hover:text-primary-hover transition">
+                Criar conta
+            </a>
+
+        </p>
+
+    </div>
+</main>
