@@ -4,8 +4,8 @@ import { LucideAngularModule, Mail, Lock, Eye, EyeOff, Check, ArrowRight, User }
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { AuthService } from '../../../core/services/auth';
-import { ToastService } from '../../../core/services/toast';
+import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { passwordMatchValidator } from '../../../core/validators/password-match.validator';
 
 interface FieldErrorRule {

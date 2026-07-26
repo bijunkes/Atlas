@@ -205,6 +205,23 @@ Tratamentos implementados:
   - Decisões técnicas;
   - Diário de desenvolvimento.
 
+### 26/07/2026 — Integração da autenticação no frontend
+
+#### Backend
+
+- Criação da rota `/auth/me` para recuperar os dados do usuário autenticado.
+- Integração com o Spring Security para identificação do usuário através do JWT.
+
+#### Frontend
+
+- Estruturação do `AuthService` para gerenciamento da autenticação.
+- Implementação do armazenamento e recuperação dos tokens JWT.
+- Validação da expiração do token utilizando `jwt-decode`.
+- Integração com a rota `/auth/me` para carregar o usuário autenticado.
+- Criação do `authInterceptor` para envio automático do token nas requisições protegidas.
+- Implementação do `authGuard` para proteção das rotas privadas.
+- Atualização do fluxo de login para persistir a sessão e redirecionar o usuário autenticado.
+
 ---
 
 ## Desenvolvido por

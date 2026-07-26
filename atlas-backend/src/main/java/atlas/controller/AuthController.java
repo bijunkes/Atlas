@@ -1,9 +1,6 @@
 package atlas.controller;
 
-import atlas.dto.AuthResponseDTO;
-import atlas.dto.LoginDTO;
-import atlas.dto.RegisterDTO;
-import atlas.dto.MessageResponseDTO;
+import atlas.dto.*;
 import atlas.service.UsuarioService;
 
 import jakarta.validation.Valid;
@@ -11,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,6 +40,14 @@ public class AuthController {
                 usuarioService.login(dados)
         );
 
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> me(Authentication authentication) {
+
+        return ResponseEntity.ok(
+                usuarioService.getUsuarioLogado(authentication.getName())
+        );
     }
 
 }

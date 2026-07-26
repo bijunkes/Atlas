@@ -3,10 +3,12 @@ package atlas.service;
 import atlas.dto.AuthResponseDTO;
 import atlas.dto.LoginDTO;
 import atlas.dto.RegisterDTO;
+import atlas.dto.UsuarioResponseDTO;
 import atlas.entity.RefreshToken;
 import atlas.entity.Usuario;
 import atlas.exception.EmailAlreadyExistsException;
 import atlas.exception.InvalidCredentialsException;
+import atlas.exception.ResourceNotFoundException;
 import atlas.repository.UsuarioRepository;
 
 import atlas.security.JwtService;
@@ -80,6 +82,19 @@ public class UsuarioService {
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getRole().name()
+        );
+    }
+
+    public UsuarioResponseDTO getUsuarioLogado(String email) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getRole()
         );
     }
 
