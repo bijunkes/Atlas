@@ -1,7 +1,8 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import Lenis from 'lenis';
 import { ToastComponent } from './core/components/toast';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,11 @@ import { ToastComponent } from './core/components/toast';
 })
 export class App implements OnInit {
   protected readonly title = signal('atlas-frontend');
+  private readonly authService = inject(AuthService);
 
   ngOnInit() {
+    this.authService.inicializarSessao();
+    
     const lenis = new Lenis({
       duration: 1.8,
       easing: (t) => 1 - Math.pow(1 - t, 5),

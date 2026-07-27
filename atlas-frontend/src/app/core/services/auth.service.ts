@@ -5,6 +5,7 @@ import { LoginRequest, AuthResponse, RegisterRequest } from '../../models/auth.m
 
 import { jwtDecode } from 'jwt-decode';
 import { Usuario } from '../models/usuario.model';
+import { UserStateService } from './user-state.service';
 
 interface JwtPayload {
   exp: number;
@@ -18,12 +19,12 @@ interface JwtPayload {
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private userState = inject(UserStateService);
 
   private apiUrl = 'http://localhost:8080/auth';
 
   private readonly ACCESS_TOKEN_KEY = 'accessToken';
   private readonly REFRESH_TOKEN_KEY = 'refreshToken';
-  private readonly USER_KEY = 'usuario';
 
   login(dados: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, dados).pipe(
@@ -40,17 +41,12 @@ export class AuthService {
   logout() {
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
+
+    this.userState.clearUsuario();
   }
 
   getCurrentUser(): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.apiUrl}/me`);
-  }
-
-  getUsuario(): Usuario | null {
-    const usuario = localStorage.getItem(this.USER_KEY);
-
-    return usuario ? (JSON.parse(usuario) as Usuario) : null;
   }
 
   getToken(): string | null {
@@ -92,15 +88,23 @@ export class AuthService {
     localStorage.setItem(this.REFRESH_TOKEN_KEY, token);
   }
 
-  private salvarUsuario(usuario: Usuario) {
-    localStorage.setItem(this.USER_KEY, JSON.stringify(usuario));
-  }
-
   carregarUsuarioLogado(): Observable<Usuario> {
     return this.getCurrentUser().pipe(
       tap((usuario) => {
-        this.salvarUsuario(usuario);
+        this.userState.setUsuario(usuario);
       }),
     );
+  }
+
+  inicializarSessao(): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
+    this.carregarUsuarioLogado().subscribe({
+      error: () => {
+        this.logout();
+      },
+    });
   }
 }

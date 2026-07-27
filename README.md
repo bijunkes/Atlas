@@ -222,6 +222,18 @@ Tratamentos implementados:
 - Implementação do `authGuard` para proteção das rotas privadas.
 - Atualização do fluxo de login para persistir a sessão e redirecionar o usuário autenticado.
 
+### 27/07/2026 — Gerenciamento de estado do usuário
+
+#### Frontend
+
+- Criação do `UserStateService` utilizando Angular Signals para gerenciamento do usuário autenticado.
+- Integração do estado global do usuário com o `AuthService`.
+- Implementação da restauração automática da sessão ao iniciar a aplicação.
+- Atualização do logout para limpar o estado do usuário.
+- Remoção do armazenamento do usuário no `localStorage`, mantendo apenas os tokens persistidos.
+- Integração do usuário autenticado no Dashboard através do `UserStateService`.
+- Implementação e validação do fluxo de logout na área protegida.
+
 ---
 
 ## Desenvolvido por
