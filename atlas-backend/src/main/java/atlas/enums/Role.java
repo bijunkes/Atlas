@@ -1,4 +1,4 @@
-package atlas.entity;
+package atlas.enums;
 
 public enum Role {
 

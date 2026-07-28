@@ -1,101 +1,24 @@
 package atlas.service;
 
-import atlas.dto.AuthResponseDTO;
-import atlas.dto.LoginDTO;
-import atlas.dto.RegisterDTO;
-import atlas.dto.UsuarioResponseDTO;
-import atlas.entity.RefreshToken;
+import atlas.dto.usuario.UsuarioResponseDTO;
 import atlas.entity.Usuario;
-import atlas.exception.EmailAlreadyExistsException;
-import atlas.exception.InvalidCredentialsException;
 import atlas.exception.ResourceNotFoundException;
 import atlas.repository.UsuarioRepository;
-
-import atlas.security.JwtService;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
-    public Usuario register(RegisterDTO dados) {
+    public UsuarioResponseDTO buscarPerfil() {
 
-        String email = dados.email()
-                .trim()
-                .toLowerCase();
+        Usuario usuario =
+                usuarioAutenticadoService.getUsuarioLogado();
 
-        if(usuarioRepository.existsByEmail(email)){
-            throw new EmailAlreadyExistsException();
-        }
-
-        Usuario usuario = Usuario.builder()
-                .nome(dados.nome())
-                .email(email)
-                .senha(passwordEncoder.encode(dados.senha()))
-                .build();
-
-        return usuarioRepository.save(usuario);
-    }
-
-    public AuthResponseDTO login(LoginDTO dados){
-
-        Usuario usuario = usuarioRepository
-                .findByEmail(
-                        dados.email()
-                                .trim()
-                                .toLowerCase()
-                )
-                .orElseThrow(
-                        InvalidCredentialsException::new
-                );
-
-        if(!passwordEncoder.matches(
-                dados.senha(),
-                usuario.getSenha()
-        )){
-            throw new InvalidCredentialsException();
-        }
-
-        return gerarResposta(usuario);
-    }
-
-    private AuthResponseDTO gerarResposta(Usuario usuario){
-
-        String accessToken =
-                jwtService.gerarToken(usuario);
-
-        RefreshToken refreshToken =
-                refreshTokenService.criar(usuario);
-
-        return new AuthResponseDTO(
-                accessToken,
-                refreshToken.getToken(),
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getRole().name()
-        );
-    }
-
-    public UsuarioResponseDTO getUsuarioLogado(String email) {
-
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
-
-        return new UsuarioResponseDTO(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getRole()
-        );
+        return UsuarioResponseDTO.fromEntity(usuario);
     }
 
 }

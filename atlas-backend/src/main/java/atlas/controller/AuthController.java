@@ -1,7 +1,8 @@
 package atlas.controller;
 
 import atlas.dto.*;
-import atlas.service.UsuarioService;
+import atlas.dto.usuario.UsuarioResponseDTO;
+import atlas.service.AuthService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
-     private final UsuarioService usuarioService;
+     private final AuthService usuarioService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
@@ -40,14 +41,6 @@ public class AuthController {
                 usuarioService.login(dados)
         );
 
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> me(Authentication authentication) {
-
-        return ResponseEntity.ok(
-                usuarioService.getUsuarioLogado(authentication.getName())
-        );
     }
 
 }

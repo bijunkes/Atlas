@@ -1,10 +1,14 @@
 package atlas.entity;
 
+import atlas.enums.Role;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -32,9 +36,32 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDateTime criadoEm;
 
+    private LocalDateTime atualizadoEm;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    // Relacionamentos
+    @OneToMany(mappedBy = "usuario")
+    @JsonManagedReference("usuario-contas")
+    @Builder.Default
+    private List<Conta> contas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario")
+    @JsonManagedReference("usuario-categorias")
+    @Builder.Default
+    private List<Categoria> categorias = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario")
+    @JsonManagedReference("usuario-transacoes")
+    @Builder.Default
+    private List<Transacao> transacoes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario")
+    @JsonManagedReference("usuario-recorrencias")
+    @Builder.Default
+    private List<Recorrencia> recorrencias = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
@@ -43,6 +70,11 @@ public class Usuario {
         if (role == null) {
             role = Role.USER;
         }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        atualizadoEm = LocalDateTime.now();
     }
 
 }

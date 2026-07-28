@@ -24,6 +24,7 @@ public class RefreshToken {
     @Column(nullable = false)
     private LocalDateTime expiracao;
 
+    // Relacionamentos
     @OneToOne
     @JoinColumn(
             name = "usuario_id",

@@ -234,6 +234,16 @@ Tratamentos implementados:
 - Integração do usuário autenticado no Dashboard através do `UserStateService`.
 - Implementação e validação do fluxo de logout na área protegida.
 
+### 28/07/2026 — Implementação da camada de domínio financeiro
+
+#### Backend
+
+- Criação das entidades financeiras e relacionamentos JPA.
+- Separação dos serviços de autenticação e usuário.
+- Implementação dos DTOs e repositories de contas, categorias e transações.
+- Criação da TransacaoService com CRUD, exclusão lógica e filtros.
+- Preparação do backend para integração com o Angular.
+
 ---
 
 ## Desenvolvido por
