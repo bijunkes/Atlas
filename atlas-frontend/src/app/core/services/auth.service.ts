@@ -6,6 +6,7 @@ import { LoginRequest, AuthResponse, RegisterRequest } from '../../models/auth.m
 import { jwtDecode } from 'jwt-decode';
 import { Usuario } from '../models/usuario.model';
 import { UserStateService } from './user-state.service';
+import { UsuarioService } from './usuario.service';
 
 interface JwtPayload {
   exp: number;
@@ -20,6 +21,7 @@ interface JwtPayload {
 export class AuthService {
   private http = inject(HttpClient);
   private userState = inject(UserStateService);
+  private usuarioService = inject(UsuarioService);
 
   private apiUrl = 'http://localhost:8080/auth';
 
@@ -27,12 +29,12 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'refreshToken';
 
   login(dados: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, dados).pipe(
-      tap((response) => {
-        this.salvarSessao(response);
-      }),
-    );
-  }
+  return this.http.post<AuthResponse>(`${this.apiUrl}/login`, dados).pipe(
+    tap((response) => {
+      this.salvarSessao(response);
+    })
+  );
+}
 
   register(dados: RegisterRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, dados);
@@ -43,10 +45,6 @@ export class AuthService {
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
 
     this.userState.clearUsuario();
-  }
-
-  getCurrentUser(): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.apiUrl}/me`);
   }
 
   getToken(): string | null {
@@ -89,7 +87,7 @@ export class AuthService {
   }
 
   carregarUsuarioLogado(): Observable<Usuario> {
-    return this.getCurrentUser().pipe(
+    return this.usuarioService.buscarPerfil().pipe(
       tap((usuario) => {
         this.userState.setUsuario(usuario);
       }),

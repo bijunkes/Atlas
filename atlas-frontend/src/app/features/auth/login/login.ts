@@ -59,8 +59,14 @@ export class LoginComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.authService.carregarUsuarioLogado().subscribe(() => {
-            this.router.navigate(['/dashboard']);
+          this.authService.carregarUsuarioLogado().subscribe({
+            next: () => {
+              this.router.navigate(['/dashboard']);
+            },
+
+            error: () => {
+              this.showError('Erro ao carregar usuário', 'Não foi possível carregar seus dados.');
+            },
           });
         },
 

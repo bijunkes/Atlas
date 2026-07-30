@@ -1,0 +1,12 @@
+<div class="flex min-h-screen bg-background">
+
+    <app-sidebar
+        [user]="usuario()"
+        (logout)="onLogout()"
+    />
+
+    <main class="flex-1 overflow-y-auto p-6 lg:ml-60">
+        <router-outlet />
+    </main>
+
+</div>

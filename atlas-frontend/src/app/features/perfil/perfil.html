@@ -1,0 +1,164 @@
+<div class="mx-auto w-full max-w-3xl space-y-6 px-4 py-8 sm:px-6 lg:px-0">
+
+    <!-- Header -->
+    <div>
+        <h1 class="text-2xl font-extrabold tracking-tight text-foreground">Perfil</h1>
+        <p class="mt-1 text-sm text-muted">Gerencie suas informações pessoais.</p>
+    </div>
+
+    @if (usuario(); as usuarioAtual) {
+    <form [formGroup]="formulario" (ngSubmit)="enviarFormulario()" class="space-y-6">
+
+        <!-- Card principal: dados do usuário -->
+        <section class="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+
+            <!-- Avatar -->
+            <div class="flex flex-col items-center gap-4 border-b border-border pb-8 sm:flex-row sm:items-center">
+                <div class="relative shrink-0">
+                    <div
+                        class="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-2 border-primary/30 bg-primary/10">
+                        @if (usuarioAtual.avatarUrl) {
+                        <img [src]="usuarioAtual.avatarUrl" [alt]="usuarioAtual.nome" class="h-full w-full object-cover" />
+                        } @else {
+                        <span class="text-xl font-bold text-primary">{{ iniciais }}</span>
+                        }
+                    </div>
+
+                    <button type="button" (click)="abrirAlteracaoAvatar()"
+                        class="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-surface bg-primary text-black shadow-md transition-colors duration-200 hover:bg-primary-hover"
+                        aria-label="Alterar foto de perfil">
+                        <lucide-angular [img]="icons.Camera" class="h-3.5 w-3.5" />
+                    </button>
+                </div>
+
+                <div class="text-center sm:text-left">
+                    <p class="text-base font-bold text-foreground">{{ usuarioAtual.nome }}</p>
+                    <p class="text-sm text-muted">{{ usuarioAtual.email }}</p>
+                </div>
+            </div>
+
+            <!-- Informações pessoais -->
+            <div class="mt-8 space-y-5">
+
+                <div>
+                    <label for="nome" class="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted">
+                        <lucide-angular [img]="icons.User" class="h-3.5 w-3.5" />
+                        Nome completo
+                    </label>
+
+                    <div class="flex items-center gap-3 rounded-xl border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                        [class.border-red-500]="formulario.controls.nome.invalid && formulario.controls.nome.touched"
+                        [class.border-border]="!(formulario.controls.nome.invalid && formulario.controls.nome.touched)">
+                        <input id="nome" type="text" formControlName="nome" placeholder="Seu nome completo"
+                            class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="email" class="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted">
+                        <lucide-angular [img]="icons.Mail" class="h-3.5 w-3.5" />
+                        E-mail
+                    </label>
+
+                    <div class="flex items-center gap-3 rounded-xl border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                        [class.border-red-500]="formulario.controls.email.invalid && formulario.controls.email.touched"
+                        [class.border-border]="!(formulario.controls.email.invalid && formulario.controls.email.touched)">
+                        <input id="email" type="email" formControlName="email" placeholder="voce@email.com"
+                            class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
+                    </div>
+                </div>
+
+                <div>
+                    <span class="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted">
+                        <lucide-angular [img]="icons.CalendarDays" class="h-3.5 w-3.5" />
+                        Membro desde
+                    </span>
+
+                    <div
+                        class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 opacity-70">
+                        <span class="text-sm text-foreground">{{ dataCadastroFormatada }}</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Card de segurança -->
+        <section class="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+            <div class="mb-6 flex items-center gap-2">
+                <lucide-angular [img]="icons.ShieldCheck" class="h-4 w-4 text-primary" />
+                <h2 class="text-sm font-bold text-foreground">Segurança da conta</h2>
+            </div>
+
+            <div class="divide-y divide-border">
+
+                <button type="button"
+                    class="flex w-full items-center justify-between gap-4 py-4 text-left transition-colors duration-200 hover:bg-white/[0.03] first:pt-0 last:pb-0">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-background">
+                            <lucide-angular [img]="icons.KeyRound" class="h-4 w-4 text-muted" />
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-foreground">Alterar senha</p>
+                            <p class="text-xs text-muted">Atualize a senha usada para acessar sua conta.</p>
+                        </div>
+                    </div>
+
+                    <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4 shrink-0 text-muted" />
+                </button>
+
+                <button type="button"
+                    class="flex w-full items-center justify-between gap-4 py-4 text-left transition-colors duration-200 hover:bg-white/[0.03] first:pt-0 last:pb-0">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-background">
+                            <lucide-angular [img]="icons.Smartphone" class="h-4 w-4 text-muted" />
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-foreground">Autenticação em duas etapas</p>
+                            <p class="text-xs text-muted">Adicione uma camada extra de segurança no login.</p>
+                        </div>
+                    </div>
+
+                    <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4 shrink-0 text-muted" />
+                </button>
+
+            </div>
+        </section>
+
+        <!-- Ações -->
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button type="button" (click)="cancelar()"
+                class="rounded-xl border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-surface-hover">
+                Cancelar
+            </button>
+
+            <button type="submit"
+                class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition-colors duration-200 hover:bg-primary-hover">
+                Salvar alterações
+            </button>
+        </div>
+
+    </form>
+    } @else {
+    <!-- Estado de carregamento, sem lógica de fetch aqui -->
+    <div class="space-y-6">
+        <div class="animate-pulse rounded-2xl border border-border bg-surface p-6 sm:p-8">
+            <div class="flex items-center gap-4 border-b border-border pb-8">
+                <div class="h-20 w-20 shrink-0 rounded-full bg-surface-hover"></div>
+                <div class="space-y-2">
+                    <div class="h-3 w-32 rounded bg-surface-hover"></div>
+                    <div class="h-2.5 w-40 rounded bg-surface-hover"></div>
+                </div>
+            </div>
+            <div class="mt-8 space-y-5">
+                <div class="h-11 rounded-xl bg-surface-hover"></div>
+                <div class="h-11 rounded-xl bg-surface-hover"></div>
+                <div class="h-11 rounded-xl bg-surface-hover"></div>
+            </div>
+        </div>
+    </div>
+    }
+
+</div>

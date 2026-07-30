@@ -1,0 +1,22 @@
+/* Scrollbar discreta na navegação — só aparece ao passar o mouse */
+nav {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+nav:hover {
+  scrollbar-color: #27272A transparent;
+}
+
+nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+nav::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 999px;
+}
+
+nav:hover::-webkit-scrollbar-thumb {
+  background-color: #27272A;
+}

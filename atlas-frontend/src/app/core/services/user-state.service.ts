@@ -5,10 +5,8 @@ import { Usuario } from '../models/usuario.model';
     providedIn: 'root',
 })
 export class UserStateService {
-    // Estado privado, somente a service pode alterá-lo
     private readonly _usuario = signal<Usuario | null>(null);
 
-    // Permite que qualquer componente leia o usuário, sem modificá-lo
     readonly usuario = this._usuario.asReadonly();
 
     setUsuario(usuario: Usuario): void {
