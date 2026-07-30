@@ -1,4 +1,6 @@
-# Atlas
+<p align="center">
+  <img src="./assets/logo-atlas-completa.png" alt="Tela inicial do Atlas" width="400"/>
+</p>
 
 > Sistema de gerenciamento de finanças pessoais desenvolvido para auxiliar no controle, organização e acompanhamento da vida financeira.
 
@@ -243,6 +245,18 @@ Tratamentos implementados:
 - Implementação dos DTOs e repositories de contas, categorias e transações.
 - Criação da TransacaoService com CRUD, exclusão lógica e filtros.
 - Preparação do backend para integração com o Angular.
+
+### 29/07/2026 — Implementação do layout e navegação da aplicação
+
+#### Frontend
+
+- Criação do `SidebarComponent` com navegação responsiva para desktop e mobile.
+- Implementação do menu hamburger, overlay e fechamento automático por rota.
+- Adição do modo recolhido/expandido com persistência no `localStorage`.
+- Implementação da área do usuário no sidebar com nome, e-mail, iniciais e logout.
+- Integração do sidebar com o UserStateService para atualização dinâmica das informações do usuário autenticado.
+- Implementação da página de perfil.
+- Criação do formulário de edição de perfil.
 
 ---
 

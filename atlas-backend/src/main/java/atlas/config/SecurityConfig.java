@@ -3,7 +3,6 @@ package atlas.config;
 import atlas.security.JwtAccessDeniedHandler;
 import atlas.security.JwtAuthenticationEntryPoint;
 import atlas.security.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
