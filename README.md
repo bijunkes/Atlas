@@ -258,6 +258,42 @@ Tratamentos implementados:
 - Implementação da página de perfil.
 - Criação do formulário de edição de perfil.
 
+### 30/07/2026 — Implementação de recuperação de senha e melhorias no perfil
+
+#### Frontend
+
+- Implementação do fluxo de alteração de senha pelo perfil do usuário.
+- Integração da recuperação de senha com envio de e-mail.
+- Adição de estados de loading e feedbacks visuais nas ações de autenticação.
+- Ajustes na página de redefinição de senha e na área de segurança do perfil.
+- Implementação da alteração e remoção da imagem de perfil.
+
+#### Backend
+
+- Implementação dos endpoints de recuperação e redefinição de senha.
+- Criação do fluxo de token temporário para alteração de senha.
+- Implementação do envio de e-mail para recuperação de acesso.
+- Integração com o Cloudinary para armazenamento em nuvem das imagens de perfil.
+- Implementação do gerenciamento das imagens dos usuários, incluindo upload e remoção de arquivos.
+
+### 31/07/2026 — Implementação de autenticação com Google e gerenciamento de senhas
+
+#### Frontend
+
+- Implementação do gerenciamento de diferentes tipos de autenticação (`LOCAL`, `GOOGLE` e `GOOGLE_AND_LOCAL`).
+- Criação do modal para usuários Google definirem uma senha de acesso por e-mail.
+- Adição de validações, confirmação de senha e feedbacks visuais no fluxo de criação de senha.
+- Ajustes na área de segurança do perfil conforme o método de login do usuário.
+- Organização do componente de perfil e padronização dos métodos.
+
+#### Backend
+
+- Implementação do suporte aos provedores de autenticação Google e Local.
+- Criação do fluxo de definição de senha para usuários autenticados via Google.
+- Atualização automática para `GOOGLE_AND_LOCAL` após criação de senha.
+- Ajustes no login e recuperação de senha para lidar com diferentes tipos de conta.
+- Validação de expiração dos tokens de recuperação de senha.
+
 ---
 
 ## Desenvolvido por

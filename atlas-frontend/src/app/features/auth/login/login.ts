@@ -1,16 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { LucideAngularModule, Mail, Lock, Eye, EyeOff, Check, ArrowRight } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
 import { ErrorService } from '../../../core/services/error.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   imports: [LucideAngularModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.css',
 })
 export class LoginComponent implements OnInit {
   private readonly toastService = inject(ToastService);
@@ -28,6 +28,20 @@ export class LoginComponent implements OnInit {
 
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
+
+  protected readonly googleAuthUrl = 'http://localhost:8080/oauth2/authorization/google';
+
+  constructor() {
+    const navigation = this.router.getCurrentNavigation();
+
+    if (navigation?.extras.state?.['registered']) {
+      this.toastService.show({
+        type: 'success',
+        title: 'Conta criada',
+        message: 'Agora você já pode entrar na sua conta.',
+      });
+    }
+  }
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -132,5 +146,52 @@ export class LoginComponent implements OnInit {
     this.showError(error.title, error.message);
 
     return false;
+  }
+
+  protected isSubmitting = signal(false);
+
+  protected recuperarSenha(): void {
+    const email = this.email?.value?.trim().toLowerCase();
+
+    if (!email) {
+      this.toastService.show({
+        type: 'error',
+        title: 'E-mail obrigatório',
+        message: 'Informe seu e-mail antes de recuperar a senha.',
+      });
+      return;
+    }
+
+    if (this.email?.invalid) {
+      this.toastService.show({
+        type: 'error',
+        title: 'E-mail inválido',
+        message: 'Digite um e-mail válido.',
+      });
+      return;
+    }
+
+    this.isSubmitting.set(true);
+
+    this.authService
+      .recuperarSenha(email)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => {
+          this.toastService.show({
+            type: 'success',
+            title: 'Solicitação enviada',
+            message: 'Se o e-mail existir, você receberá as instruções.',
+          });
+        },
+
+        error: () => {
+          this.toastService.show({
+            type: 'error',
+            title: 'Erro',
+            message: 'Não foi possível processar sua solicitação.',
+          });
+        },
+      });
   }
 }

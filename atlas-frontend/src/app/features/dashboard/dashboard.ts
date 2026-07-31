@@ -3,31 +3,16 @@ import { Router, RouterOutlet } from '@angular/router';
 
 import { SidebarComponent } from '../../shared/sidebar/sidebar';
 import { UserStateService } from '../../core/services/user-state.service';
-import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    SidebarComponent,
-    RouterOutlet
-  ],
+  imports: [],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class DashboardComponent {
-
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly userState = inject(UserStateService);
 
   protected readonly usuario = this.userState.usuario;
-
-  protected onLogout(): void {
-
-    this.authService.logout();
-
-    this.router.navigate(['/login']);
-  }
-
 }

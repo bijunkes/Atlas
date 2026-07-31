@@ -1,4 +1,15 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, Output, PLATFORM_ID, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  PLATFORM_ID,
+  signal,
+} from '@angular/core';
+
+import { UserStateService } from '../../core/services/user-state.service';
 
 // Permite destruir automaticamente subscriptions quando o componente for destruído
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -21,14 +32,16 @@ import {
   ChevronLeft,
   ChevronRight,
   WalletCards,
-  type LucideIconData
+  type LucideIconData,
 } from 'lucide-angular';
+import { ToastService } from '../../core/services/toast.service';
 
 // Interface que define quais informações do usuário o Sidebar precisa receber
 // Obs: O componente não busca o usuário sozinho, ele recebe através do componente pai
 export interface SidebarUser {
   nome: string;
   email: string;
+  imagemPerfil?: string | null;
 }
 
 // Interface que representa cada item do menu lateral
@@ -45,17 +58,11 @@ const SIDEBAR_COLLAPSED_KEY = 'sidebar-collapsed';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    RouterLinkActive,
-    LucideAngularModule
-  ],
+  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
 export class SidebarComponent {
-
   // Recebe os dados do usuário logado vindos do componente pai
   @Input() user: SidebarUser | null = null;
 
@@ -78,65 +85,62 @@ export class SidebarComponent {
     WalletCards,
   };
 
+  private readonly userState = inject(UserStateService);
+  protected readonly usuario = this.userState.usuario;
+  private readonly toastService = inject(ToastService);
+
   // Lista dos itens que aparecem no menu lateral
   protected readonly navItems: NavItem[] = [
     {
       label: 'Dashboard',
       route: '/dashboard',
       icon: LayoutDashboard,
-      exact: true
+      exact: true,
     },
     {
       label: 'Contas',
       route: '/contas',
-      icon: Wallet
+      icon: Wallet,
     },
     {
       label: 'Transações',
       route: '/transacoes',
-      icon: ArrowLeftRight
+      icon: ArrowLeftRight,
     },
     {
       label: 'Categorias',
       route: '/categorias',
-      icon: Tags
+      icon: Tags,
     },
     {
       label: 'Recorrências',
       route: '/recorrencias',
-      icon: Repeat
-    }
+      icon: Repeat,
+    },
   ];
 
   // Signal que controla se o menu mobile está aberto
   protected readonly isMobileOpen = signal(false);
 
   // Signal que controla se o sidebar está expandido ou recolhido
-  protected readonly isCollapsed = signal(
-    this.readCollapsedFromStorage()
-  );
+  protected readonly isCollapsed = signal(this.readCollapsedFromStorage());
 
   constructor() {
-
     // Observa mudanças de rota
     this.router.events
       .pipe(
-
         // Considera somente eventos que indicam finalização da navegação
         filter((event) => event instanceof NavigationEnd),
 
         // Cancela a inscrição automaticamente quando o componente morrer
-        takeUntilDestroyed(this.destroyRef)
-
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => this.closeMobileMenu());
   }
 
   // Abre ou fecha o menu lateral no mobile
   protected toggleMobileMenu(): void {
-    this.isMobileOpen.update(
-      (open) => !open
-    );
+    this.isMobileOpen.update((open) => !open);
   }
 
   // Fecha o menu mobile
@@ -153,14 +157,21 @@ export class SidebarComponent {
 
   // Emite o evento de logout para o componente pai
   protected onLogoutClick(): void {
+    this.toastService.show({
+      type: 'success',
+      title: 'Até logo!',
+      message: 'Você saiu da sua conta.',
+    });
     this.logout.emit();
   }
 
   // Cria as iniciais do usuário para mostrar no avatar
   protected get initials(): string {
-    if (!this.user?.nome) return '';
+    const nome = this.usuario()?.nome;
 
-    return this.user.nome
+    if (!nome) return '';
+
+    return nome
       .trim()
       .split(/\s+/)
       .slice(0, 2)
@@ -177,10 +188,6 @@ export class SidebarComponent {
   private writeCollapsedToStorage(value: boolean): void {
     if (!this.isBrowser) return;
 
-    localStorage.setItem(
-      SIDEBAR_COLLAPSED_KEY,
-      String(value)
-    );
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(value));
   }
-
 }

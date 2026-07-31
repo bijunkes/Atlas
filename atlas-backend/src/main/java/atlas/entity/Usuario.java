@@ -1,6 +1,7 @@
 package atlas.entity;
 
 import atlas.enums.Role;
+import atlas.enums.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Usuario {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,7 +31,7 @@ public class Usuario {
     private String email;
 
     @JsonIgnore
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String senha;
 
     @Column(nullable = false)
@@ -41,6 +42,15 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Column(name = "imagem_perfil", length = 255)
+    private String imagemPerfil;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AuthProvider provider;
+
+    private String googleId;
 
     // Relacionamentos
     @OneToMany(mappedBy = "usuario")
@@ -69,6 +79,10 @@ public class Usuario {
 
         if (role == null) {
             role = Role.USER;
+        }
+
+        if (provider == null) {
+            provider = AuthProvider.LOCAL;
         }
     }
 

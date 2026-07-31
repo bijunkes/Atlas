@@ -16,29 +16,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
+        private final RefreshTokenRepository refreshTokenRepository;
 
-    @Transactional
-    public RefreshToken criar(Usuario usuario){
+        @Transactional
+        public RefreshToken criar(Usuario usuario) {
 
-        RefreshToken refreshToken = refreshTokenRepository
-                .findByUsuarioId(usuario.getId())
-                .orElse(new RefreshToken());
+                RefreshToken refreshToken = refreshTokenRepository
+                                .findByUsuarioId(usuario.getId())
+                                .orElse(new RefreshToken());
 
+                refreshToken.setToken(
+                                UUID.randomUUID().toString());
 
-        refreshToken.setToken(
-                UUID.randomUUID().toString()
-        );
+                refreshToken.setUsuario(usuario);
 
+                refreshToken.setExpiracao(
+                                LocalDateTime.now().plusDays(7));
 
-        refreshToken.setUsuario(usuario);
-
-
-        refreshToken.setExpiracao(
-                LocalDateTime.now().plusDays(7)
-        );
-
-        return refreshTokenRepository.save(refreshToken);
-    }
+                return refreshTokenRepository.save(refreshToken);
+        }
 
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ErrorResponse } from '../../models/error-response.model';
+import { ErrorResponse } from '../models/error-response.model';
 
 export interface ErrorMessage {
     title: string;

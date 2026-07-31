@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { LoginRequest, AuthResponse, RegisterRequest } from '../../models/auth.model';
+import { LoginRequest, AuthResponse, RegisterRequest } from '../models/auth.model';
 
 import { jwtDecode } from 'jwt-decode';
 import { Usuario } from '../models/usuario.model';
@@ -29,12 +29,12 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'refreshToken';
 
   login(dados: LoginRequest): Observable<AuthResponse> {
-  return this.http.post<AuthResponse>(`${this.apiUrl}/login`, dados).pipe(
-    tap((response) => {
-      this.salvarSessao(response);
-    })
-  );
-}
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, dados).pipe(
+      tap((response) => {
+        this.salvarSessao(response);
+      }),
+    );
+  }
 
   register(dados: RegisterRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, dados);
@@ -78,6 +78,12 @@ export class AuthService {
     this.salvarRefreshToken(resposta.refreshToken);
   }
 
+  salvarTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
+
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+  }
+
   private salvarAccessToken(token: string) {
     localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
   }
@@ -104,5 +110,13 @@ export class AuthService {
         this.logout();
       },
     });
+  }
+
+  recuperarSenha(email: string) {
+    return this.http.post(`${this.apiUrl}/recuperar-senha`, { email });
+  }
+
+  resetarSenha(dados: { token: string; novaSenha: string }) {
+    return this.http.post(`${this.apiUrl}/resetar-senha`, dados);
   }
 }

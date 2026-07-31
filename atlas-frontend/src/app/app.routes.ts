@@ -20,6 +20,18 @@ export const routes: Routes = [
   },
 
   {
+    path: 'resetar-senha',
+    loadComponent: () =>
+      import('./features/auth/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
+  },
+
+  {
+    path: 'oauth/callback',
+    loadComponent: () =>
+      import('./features/auth/oauth-callback/oauth-callback').then((m) => m.OAuthCallbackComponent),
+  },
+
+  {
     path: '',
     loadComponent: () =>
       import('./features/authenticated/authenticated').then((m) => m.AuthenticatedComponent),
@@ -27,6 +39,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
 
     children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -59,8 +77,6 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () => import('./features/perfil/perfil').then((m) => m.PerfilComponent),
-
-        canActivate: [authGuard],
       },
     ],
   },

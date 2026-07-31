@@ -15,48 +15,45 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final SecretKey key;
-    private final long expiration;
+        private final SecretKey key;
+        private final long expiration;
 
-    public JwtService(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration
-    ) {
+        public JwtService(
+                        @Value("${jwt.secret}") String secret,
+                        @Value("${jwt.expiration}") long expiration) {
 
-        this.key = Keys.hmacShaKeyFor(
-                secret.getBytes(StandardCharsets.UTF_8)
-        );
+                this.key = Keys.hmacShaKeyFor(
+                                secret.getBytes(StandardCharsets.UTF_8));
 
-        this.expiration = expiration;
-    }
+                this.expiration = expiration;
+        }
 
-    public String gerarToken(Usuario usuario) {
+        public String gerarToken(Usuario usuario) {
 
-        return Jwts.builder()
-                .subject(usuario.getEmail())
+                return Jwts.builder()
+                                .subject(usuario.getEmail())
 
-                .claim("id", usuario.getId())
-                .claim("role", usuario.getRole().name())
+                                .claim("id", usuario.getId())
+                                .claim("role", usuario.getRole().name())
 
-                .issuedAt(new Date())
+                                .issuedAt(new Date())
 
-                .expiration(
-                        new Date(System.currentTimeMillis() + expiration)
-                )
+                                .expiration(
+                                                new Date(System.currentTimeMillis() + expiration))
 
-                .signWith(key)
+                                .signWith(key)
 
-                .compact();
-    }
+                                .compact();
+        }
 
-    public String extrairEmail(String token) {
+        public String extrairEmail(String token) {
 
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-    }
+                return Jwts.parser()
+                                .verifyWith(key)
+                                .build()
+                                .parseSignedClaims(token)
+                                .getPayload()
+                                .getSubject();
+        }
 
 }

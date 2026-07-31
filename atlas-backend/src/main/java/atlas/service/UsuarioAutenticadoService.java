@@ -17,18 +17,16 @@ public class UsuarioAutenticadoService {
 
     public Usuario getUsuarioLogado() {
 
-        Authentication authentication =
-                SecurityContextHolder.getContext()
-                        .getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
 
-        if(authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new UnauthorizedException("Usuário não autenticado");
         }
 
         String email = authentication.getName();
 
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 }

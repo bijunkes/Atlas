@@ -3,6 +3,7 @@ package atlas.config;
 import atlas.security.JwtAccessDeniedHandler;
 import atlas.security.JwtAuthenticationEntryPoint;
 import atlas.security.JwtAuthenticationFilter;
+import atlas.security.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,52 +18,57 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    // Injetando dependências
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+        private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+        private final OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        return http
-                .csrf(csrf -> csrf.disable())
+                return http
+                                .csrf(csrf -> csrf.disable())
 
-                .cors(cors -> {})
+                                .cors(cors -> {
+                                })
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
+                                .sessionManagement(session -> session.sessionCreationPolicy(
+                                                SessionCreationPolicy.IF_REQUIRED))
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/register",
-                                "/auth/login"
-                        ).permitAll()
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                "/auth/register",
+                                                                "/auth/login",
+                                                                "/auth/recuperar-senha",
+                                                                "/auth/resetar-senha",
+                                                                "/oauth2/**",
+                                                                "/login/oauth2/**")
+                                                .permitAll()
 
-                        .anyRequest().authenticated()
-                )
+                                                .anyRequest().authenticated())
 
-                .exceptionHandling(exception ->
-                        exception
-                                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                                .accessDeniedHandler(jwtAccessDeniedHandler)
-                )
+                                .oauth2Login(oauth2 -> oauth2
+                                                .successHandler(oauth2AuthenticationSuccessHandler)
+                                                .failureHandler((request, response, exception) -> {
 
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
+                                                        response.sendRedirect(
+                                                                        "http://localhost:4200/login");
+                                                }))
 
-                .build();
+                                .exceptionHandling(exception -> exception
+                                                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                                                .accessDeniedHandler(jwtAccessDeniedHandler))
 
-    }
+                                .addFilterBefore(
+                                                jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class)
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                                .build();
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
 }

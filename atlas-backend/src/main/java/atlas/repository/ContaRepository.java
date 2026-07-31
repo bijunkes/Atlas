@@ -17,7 +17,6 @@ public interface ContaRepository extends JpaRepository<Conta, Long> {
 
     Optional<Conta> findByIdAndUsuarioAndAtivoTrue(
             Long id,
-            Usuario usuario
-    );
+            Usuario usuario);
 
 }

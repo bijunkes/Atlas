@@ -26,6 +26,32 @@ export class UsuarioService {
     );
   }
 
+  atualizarImagemPerfil(file: File) {
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    return this.http.put<Usuario>(`${this.apiUrl}/me/imagem`, formData).pipe(
+      tap((usuarioAtualizado) => {
+        this.userState.setUsuario(usuarioAtualizado);
+      }),
+    );
+  }
+
+  removerImagemPerfil(): Observable<Usuario> {
+    return this.http.delete<Usuario>(`${this.apiUrl}/me/imagem`).pipe(
+      tap((usuarioAtualizado) => {
+        this.userState.setUsuario(usuarioAtualizado);
+      }),
+    );
+  }
+
+  criarSenha(senha: string) {
+    return this.http.put<void>(`${this.apiUrl}/criar-senha`, {
+      senha,
+    });
+  }
+
   alterarSenha() {}
 
   excluirConta() {}

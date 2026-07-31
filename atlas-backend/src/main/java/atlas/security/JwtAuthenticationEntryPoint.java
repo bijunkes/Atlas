@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Component // Crie uma instância da classe automaticamente
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint { // Essa interface pertence ao Spring Security
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint { // Essa interface pertence ao Spring
+                                                                               // Security
 
         private final ObjectMapper objectMapper;
 
@@ -27,9 +28,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint { /
 
         @Override
         public void commence( // Possui apenas um método obrigatório
-                HttpServletRequest request,
-                HttpServletResponse response, // Resposta a enviar para o front-end
-                AuthenticationException authException // Contém o motivo da falha
+                        HttpServletRequest request,
+                        HttpServletResponse response, // Resposta a enviar para o front-end
+                        AuthenticationException authException // Contém o motivo da falha
         ) throws IOException, ServletException {
 
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Usuário não está autenticado
@@ -39,19 +40,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint { /
                 response.setCharacterEncoding("UTF-8"); // Resposta ser erros ortográficos
 
                 // Criando erro
-            ErrorResponseDTO error =
-                    new ErrorResponseDTO(
-                            "Não autorizado. Faça login novamente.",
-                            ErrorCode.UNAUTHORIZED,
-                            HttpServletResponse.SC_UNAUTHORIZED,
-                            LocalDateTime.now()
-                    );
+                ErrorResponseDTO error = new ErrorResponseDTO(
+                                "Não autorizado. Faça login novamente.",
+                                ErrorCode.UNAUTHORIZED,
+                                HttpServletResponse.SC_UNAUTHORIZED,
+                                LocalDateTime.now());
 
                 // Convertendo erro em JSON
                 response.getWriter()
-                        .write(
-                                objectMapper.writeValueAsString(error)
-                        );
+                                .write(
+                                                objectMapper.writeValueAsString(error));
         }
 
 }

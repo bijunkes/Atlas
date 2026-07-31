@@ -17,150 +17,125 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContaService {
 
-    private final ContaRepository contaRepository;
-    private final InstituicaoFinanceiraRepository instituicaoRepository;
-    private final UsuarioAutenticadoService usuarioAutenticadoService;
+        private final ContaRepository contaRepository;
+        private final InstituicaoFinanceiraRepository instituicaoRepository;
+        private final UsuarioAutenticadoService usuarioAutenticadoService;
 
-    public ContaResponseDTO criar(ContaRequestDTO dados) {
+        public ContaResponseDTO criar(ContaRequestDTO dados) {
 
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-        InstituicaoFinanceira instituicao = null;
+                InstituicaoFinanceira instituicao = null;
 
-        if (dados.instituicaoId() != null) {
+                if (dados.instituicaoId() != null) {
 
-            instituicao =
-                    instituicaoRepository.findById(dados.instituicaoId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException(
-                                            "Instituição não encontrada"
-                                    ));
+                        instituicao = instituicaoRepository.findById(dados.instituicaoId())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Instituição não encontrada"));
+                }
+
+                Conta conta = Conta.builder()
+                                .usuario(usuario)
+                                .instituicao(instituicao)
+                                .nome(dados.nome())
+                                .tipo(dados.tipo())
+                                .saldoInicial(dados.saldoInicial())
+                                .numeroAgencia(dados.numeroAgencia())
+                                .numeroConta(dados.numeroConta())
+                                .ativo(true)
+                                .build();
+
+                contaRepository.save(conta);
+
+                return toResponse(conta);
         }
 
-        Conta conta = Conta.builder()
-                .usuario(usuario)
-                .instituicao(instituicao)
-                .nome(dados.nome())
-                .tipo(dados.tipo())
-                .saldoInicial(dados.saldoInicial())
-                .numeroAgencia(dados.numeroAgencia())
-                .numeroConta(dados.numeroConta())
-                .ativo(true)
-                .build();
+        public List<ContaResponseDTO> listarMinhasContas() {
 
-        contaRepository.save(conta);
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-        return toResponse(conta);
-    }
-
-    public List<ContaResponseDTO> listarMinhasContas() {
-
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
-
-        return contaRepository
-                .findByUsuarioAndAtivoTrue(usuario)
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    public ContaResponseDTO buscarPorId(Long id) {
-
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
-
-        Conta conta =
-                contaRepository.findByIdAndUsuario(id, usuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Conta não encontrada"
-                                ));
-
-        return toResponse(conta);
-    }
-
-    private ContaResponseDTO toResponse(Conta conta) {
-
-        return new ContaResponseDTO(
-                conta.getId(),
-                conta.getNome(),
-                conta.getTipo(),
-                conta.getSaldoInicial(),
-                conta.getInstituicao() != null
-                        ? conta.getInstituicao().getNome()
-                        : null,
-                conta.getAtivo()
-        );
-    }
-
-    public ContaResponseDTO atualizar(Long id, ContaRequestDTO dados) {
-
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
-
-        Conta conta =
-                contaRepository.findByIdAndUsuario(id, usuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Conta não encontrada"
-                                ));
-
-        InstituicaoFinanceira instituicao = null;
-
-        if (dados.instituicaoId() != null) {
-
-            instituicao =
-                    instituicaoRepository.findById(dados.instituicaoId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException(
-                                            "Instituição não encontrada"
-                                    ));
+                return contaRepository
+                                .findByUsuarioAndAtivoTrue(usuario)
+                                .stream()
+                                .map(this::toResponse)
+                                .toList();
         }
 
-        conta.setNome(dados.nome());
-        conta.setTipo(dados.tipo());
-        conta.setInstituicao(instituicao);
-        conta.setNumeroAgencia(dados.numeroAgencia());
-        conta.setNumeroConta(dados.numeroConta());
+        public ContaResponseDTO buscarPorId(Long id) {
 
-        contaRepository.save(conta);
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-        return toResponse(conta);
-    }
+                Conta conta = contaRepository.findByIdAndUsuario(id, usuario)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Conta não encontrada"));
 
-    public void desativar(Long id) {
+                return toResponse(conta);
+        }
 
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
+        private ContaResponseDTO toResponse(Conta conta) {
 
-        Conta conta =
-                contaRepository.findByIdAndUsuario(id, usuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Conta não encontrada"
-                                ));
+                return new ContaResponseDTO(
+                                conta.getId(),
+                                conta.getNome(),
+                                conta.getTipo(),
+                                conta.getSaldoInicial(),
+                                conta.getInstituicao() != null
+                                                ? conta.getInstituicao().getNome()
+                                                : null,
+                                conta.getAtivo());
+        }
 
-        conta.setAtivo(false);
+        public ContaResponseDTO atualizar(Long id, ContaRequestDTO dados) {
 
-        contaRepository.save(conta);
-    }
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-    public void reativar(Long id) {
+                Conta conta = contaRepository.findByIdAndUsuario(id, usuario)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Conta não encontrada"));
 
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
+                InstituicaoFinanceira instituicao = null;
 
-        Conta conta =
-                contaRepository.findByIdAndUsuario(id, usuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Conta não encontrada"
-                                ));
+                if (dados.instituicaoId() != null) {
 
-        conta.setAtivo(true);
+                        instituicao = instituicaoRepository.findById(dados.instituicaoId())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Instituição não encontrada"));
+                }
 
-        contaRepository.save(conta);
-    }
+                conta.setNome(dados.nome());
+                conta.setTipo(dados.tipo());
+                conta.setInstituicao(instituicao);
+                conta.setNumeroAgencia(dados.numeroAgencia());
+                conta.setNumeroConta(dados.numeroConta());
+
+                contaRepository.save(conta);
+
+                return toResponse(conta);
+        }
+
+        public void desativar(Long id) {
+
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
+
+                Conta conta = contaRepository.findByIdAndUsuario(id, usuario)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Conta não encontrada"));
+
+                conta.setAtivo(false);
+
+                contaRepository.save(conta);
+        }
+
+        public void reativar(Long id) {
+
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
+
+                Conta conta = contaRepository.findByIdAndUsuario(id, usuario)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Conta não encontrada"));
+
+                conta.setAtivo(true);
+
+                contaRepository.save(conta);
+        }
 }

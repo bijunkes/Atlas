@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record TransacaoRequestDTO(
+
         Long contaId,
         Long categoriaId,
         BigDecimal valor,
@@ -15,4 +16,5 @@ public record TransacaoRequestDTO(
         StatusTransacao status,
         LocalDate dataTransacao,
         String observacao
+        
 ) {}

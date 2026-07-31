@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record TransacaoResponseDTO(
+
         Long id,
         BigDecimal valor,
         String descricao,
@@ -15,4 +16,5 @@ public record TransacaoResponseDTO(
         LocalDate dataTransacao,
         String categoriaNome,
         String contaNome
+        
 ) {}

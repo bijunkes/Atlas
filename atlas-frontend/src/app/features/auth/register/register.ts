@@ -1,6 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { LucideAngularModule, Mail, Lock, Eye, EyeOff, Check, ArrowRight, User } from 'lucide-angular';
+import {
+  LucideAngularModule,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Check,
+  ArrowRight,
+  User,
+  ShieldCheck,
+} from 'lucide-angular';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
@@ -33,10 +43,13 @@ export class RegisterComponent {
   readonly EyeOff = EyeOff;
   readonly Check = Check;
   readonly ArrowRight = ArrowRight;
+  readonly ShieldCheck = ShieldCheck;
 
   passwordVisible = false;
   confirmPasswordVisible = false;
   isSubmitting = signal(false);
+
+  protected readonly googleAuthUrl = 'http://localhost:8080/oauth2/authorization/google';
 
   readonly registerForm = this.fb.nonNullable.group(
     {
@@ -48,14 +61,24 @@ export class RegisterComponent {
     },
     {
       validators: passwordMatchValidator('senha', 'confirmarSenha'),
-    }
+    },
   );
 
-  get nome() { return this.registerForm.controls.nome; }
-  get email() { return this.registerForm.controls.email; }
-  get senha() { return this.registerForm.controls.senha; }
-  get confirmarSenha() { return this.registerForm.controls.confirmarSenha; }
-  get termosAceitos() { return this.registerForm.controls.termosAceitos; }
+  get nome() {
+    return this.registerForm.controls.nome;
+  }
+  get email() {
+    return this.registerForm.controls.email;
+  }
+  get senha() {
+    return this.registerForm.controls.senha;
+  }
+  get confirmarSenha() {
+    return this.registerForm.controls.confirmarSenha;
+  }
+  get termosAceitos() {
+    return this.registerForm.controls.termosAceitos;
+  }
 
   register(): void {
     this.registerForm.markAllAsTouched();
@@ -75,14 +98,31 @@ export class RegisterComponent {
       })
       .subscribe({
         next: () => {
-          this.isSubmitting.set(false); 
-          this.router.navigate(['/login'], { state: { email } });
+          this.isSubmitting.set(false);
+
+          this.router.navigate(['/login'], {
+            state: {
+              email,
+              registered: true,
+            },
+          });
         },
         error: (err: HttpErrorResponse) => {
           this.isSubmitting.set(false);
+
+          if (err.status === 409) {
+            this.showError('E-mail já cadastrado', 'Já existe uma conta usando esse e-mail.');
+            return;
+          }
+
+          if (err.status === 400) {
+            this.showError('Dados inválidos', 'Verifique as informações preenchidas.');
+            return;
+          }
+
           this.showError(
             'Erro ao criar conta',
-            err.error?.message ?? 'Ocorreu um erro inesperado.'
+            'Não foi possível criar sua conta. Tente novamente.',
           );
         },
       });
@@ -127,7 +167,7 @@ export class RegisterComponent {
       },
     ];
 
-    const firstError = rules.find(rule => rule.invalid);
+    const firstError = rules.find((rule) => rule.invalid);
 
     if (firstError) {
       this.showError(firstError.title, firstError.message);
@@ -139,5 +179,13 @@ export class RegisterComponent {
 
   private showError(title: string, message: string): void {
     this.toastService.show({ type: 'error', title, message });
+  }
+
+  private showSuccess(title: string, message: string): void {
+    this.toastService.show({
+      type: 'success',
+      title,
+      message,
+    });
   }
 }

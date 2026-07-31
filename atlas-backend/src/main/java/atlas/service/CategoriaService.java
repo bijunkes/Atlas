@@ -15,118 +15,100 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriaService {
 
-    private final CategoriaRepository categoriaRepository;
-    private final UsuarioAutenticadoService usuarioAutenticadoService;
+        private final CategoriaRepository categoriaRepository;
+        private final UsuarioAutenticadoService usuarioAutenticadoService;
 
-    public CategoriaResponseDTO criar(CategoriaRequestDTO dados) {
+        public CategoriaResponseDTO criar(CategoriaRequestDTO dados) {
 
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-        Categoria categoria = Categoria.builder()
-                .usuario(usuario)
-                .nome(dados.nome())
-                .cor(dados.cor())
-                .icone(dados.icone())
-                .padrao(false)
-                .ativo(true)
-                .build();
+                Categoria categoria = Categoria.builder()
+                                .usuario(usuario)
+                                .nome(dados.nome())
+                                .cor(dados.cor())
+                                .icone(dados.icone())
+                                .padrao(false)
+                                .ativo(true)
+                                .build();
 
-        categoriaRepository.save(categoria);
+                categoriaRepository.save(categoria);
 
-        return toResponse(categoria);
-    }
-
-    public List<CategoriaResponseDTO> listarMinhasCategorias() {
-
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
-
-        return categoriaRepository
-                .listarDisponiveisParaUsuario(usuario)
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    public CategoriaResponseDTO buscarPorId(Long id) {
-
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
-
-        Categoria categoria =
-                categoriaRepository.buscarDisponivel(id, usuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Categoria não encontrada"
-                                ));
-
-        return toResponse(categoria);
-    }
-
-    public CategoriaResponseDTO atualizar(
-            Long id,
-            CategoriaRequestDTO dados
-    ) {
-
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
-
-        Categoria categoria =
-                categoriaRepository.findByIdAndUsuario(id, usuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Categoria não encontrada"
-                                ));
-
-        if(categoria.getPadrao()) {
-            throw new RuntimeException(
-                    "Categorias padrão não podem ser alteradas"
-            );
+                return toResponse(categoria);
         }
 
-        categoria.setNome(dados.nome());
-        categoria.setCor(dados.cor());
-        categoria.setIcone(dados.icone());
+        public List<CategoriaResponseDTO> listarMinhasCategorias() {
 
-        categoriaRepository.save(categoria);
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-        return toResponse(categoria);
-    }
-
-    public void desativar(Long id) {
-
-        Usuario usuario =
-                usuarioAutenticadoService.getUsuarioLogado();
-
-        Categoria categoria =
-                categoriaRepository.findByIdAndUsuario(id, usuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Categoria não encontrada"
-                                ));
-
-        if(categoria.getPadrao()) {
-            throw new RuntimeException(
-                    "Categorias padrão não podem ser removidas"
-            );
+                return categoriaRepository
+                                .listarDisponiveisParaUsuario(usuario)
+                                .stream()
+                                .map(this::toResponse)
+                                .toList();
         }
 
-        categoria.setAtivo(false);
+        public CategoriaResponseDTO buscarPorId(Long id) {
 
-        categoriaRepository.save(categoria);
-    }
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-    private CategoriaResponseDTO toResponse(Categoria categoria) {
+                Categoria categoria = categoriaRepository.buscarDisponivel(id, usuario)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Categoria não encontrada"));
 
-        return new CategoriaResponseDTO(
-                categoria.getId(),
-                categoria.getNome(),
-                categoria.getCor(),
-                categoria.getIcone(),
-                categoria.getPadrao(),
-                categoria.getAtivo()
-        );
-    }
+                return toResponse(categoria);
+        }
+
+        public CategoriaResponseDTO atualizar(
+                        Long id,
+                        CategoriaRequestDTO dados) {
+
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
+
+                Categoria categoria = categoriaRepository.findByIdAndUsuario(id, usuario)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Categoria não encontrada"));
+
+                if (categoria.getPadrao()) {
+                        throw new RuntimeException(
+                                        "Categorias padrão não podem ser alteradas");
+                }
+
+                categoria.setNome(dados.nome());
+                categoria.setCor(dados.cor());
+                categoria.setIcone(dados.icone());
+
+                categoriaRepository.save(categoria);
+
+                return toResponse(categoria);
+        }
+
+        public void desativar(Long id) {
+
+                Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
+
+                Categoria categoria = categoriaRepository.findByIdAndUsuario(id, usuario)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Categoria não encontrada"));
+
+                if (categoria.getPadrao()) {
+                        throw new RuntimeException(
+                                        "Categorias padrão não podem ser removidas");
+                }
+
+                categoria.setAtivo(false);
+
+                categoriaRepository.save(categoria);
+        }
+
+        private CategoriaResponseDTO toResponse(Categoria categoria) {
+
+                return new CategoriaResponseDTO(
+                                categoria.getId(),
+                                categoria.getNome(),
+                                categoria.getCor(),
+                                categoria.getIcone(),
+                                categoria.getPadrao(),
+                                categoria.getAtivo());
+        }
 
 }

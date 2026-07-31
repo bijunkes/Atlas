@@ -10,25 +10,23 @@ import java.util.Optional;
 
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 
-    @Query("""
-        SELECT c FROM Categoria c
-        WHERE (c.usuario = :usuario OR c.padrao = true)
-        AND c.ativo = true
-    """)
-    List<Categoria> listarDisponiveisParaUsuario(
-            Usuario usuario
-    );
+        @Query("""
+                        SELECT c FROM Categoria c
+                        WHERE (c.usuario = :usuario OR c.padrao = true)
+                        AND c.ativo = true
+                        """)
+        List<Categoria> listarDisponiveisParaUsuario(
+                        Usuario usuario);
 
-    @Query("""
-        SELECT c FROM Categoria c
-        WHERE c.id = :id
-        AND (c.usuario = :usuario OR c.padrao = true)
-    """)
-    Optional<Categoria> buscarDisponivel(
-            Long id,
-            Usuario usuario
-    );
+        @Query("""
+                        SELECT c FROM Categoria c
+                        WHERE c.id = :id
+                        AND (c.usuario = :usuario OR c.padrao = true)
+                        """)
+        Optional<Categoria> buscarDisponivel(
+                        Long id,
+                        Usuario usuario);
 
-    Optional<Categoria> findByIdAndUsuario(Long id, Usuario usuario);
+        Optional<Categoria> findByIdAndUsuario(Long id, Usuario usuario);
 
 }

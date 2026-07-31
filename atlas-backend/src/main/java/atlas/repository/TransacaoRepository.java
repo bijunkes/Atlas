@@ -11,22 +11,18 @@ import java.util.Optional;
 
 public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
-    List<Transacao> findByUsuarioAndExcluidoEmIsNull(
-            Usuario usuario
-    );
+        List<Transacao> findByUsuarioAndExcluidoEmIsNull(
+                        Usuario usuario);
 
-    List<Transacao> findByContaAndExcluidoEmIsNull(
-            Conta conta
-    );
+        List<Transacao> findByContaAndExcluidoEmIsNull(
+                        Conta conta);
 
-    List<Transacao> findByUsuarioAndDataTransacaoBetweenAndExcluidoEmIsNull(
-            Usuario usuario,
-            LocalDate inicio,
-            LocalDate fim
-    );
+        List<Transacao> findByUsuarioAndDataTransacaoBetweenAndExcluidoEmIsNull(
+                        Usuario usuario,
+                        LocalDate inicio,
+                        LocalDate fim);
 
-    Optional<Transacao> findByIdAndUsuarioAndExcluidoEmIsNull(
-            Long id,
-            Usuario usuario
-    );
+        Optional<Transacao> findByIdAndUsuarioAndExcluidoEmIsNull(
+                        Long id,
+                        Usuario usuario);
 }

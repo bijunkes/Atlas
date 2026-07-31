@@ -26,117 +26,122 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import io.jsonwebtoken.ExpiredJwtException;
 
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final UsuarioRepository usuarioRepository;
-    private final ObjectMapper objectMapper;
+        private final JwtService jwtService;
+        private final UsuarioRepository usuarioRepository;
+        private final ObjectMapper objectMapper;
 
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+        @Override
+        protected void doFilterInternal(
+                        HttpServletRequest request,
+                        HttpServletResponse response,
+                        FilterChain filterChain) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+                String token = extrairToken(request);
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+                if (token == null) {
+                        filterChain.doFilter(request, response);
+                        return;
+                }
 
-            filterChain.doFilter(request, response);
-            return;
+                try {
+
+                        String email = jwtService.extrairEmail(token);
+
+                        autenticarUsuario(email, request);
+
+                } catch (ExpiredJwtException e) {
+
+                        enviarErro(
+                                        response,
+                                        "Sua sessão expirou.",
+                                        ErrorCode.TOKEN_EXPIRED);
+
+                        return;
+
+                } catch (Exception e) {
+
+                        enviarErro(
+                                        response,
+                                        "Token inválido.",
+                                        ErrorCode.TOKEN_INVALID);
+
+                        return;
+                }
+
+                filterChain.doFilter(request, response);
+
         }
 
-        String token = authHeader.substring(7);
+        private void enviarErro(
+                        HttpServletResponse response,
+                        String mensagem,
+                        ErrorCode code
 
-        String email;
+        ) throws IOException {
 
-        try {
-            email = jwtService.extrairEmail(token);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
 
-        } catch(ExpiredJwtException e) {
+                ErrorResponseDTO error = new ErrorResponseDTO(
+                                mensagem,
+                                code,
+                                401,
+                                LocalDateTime.now());
 
-            enviarErro(
-                    response,
-                    "Sua sessão expirou.",
-                    ErrorCode.TOKEN_EXPIRED
-            );
-
-            return;
-
-        } catch(Exception e) {
-
-            enviarErro(
-                    response,
-                    "Token inválido.",
-                    ErrorCode.TOKEN_INVALID
-            );
-
-            return;
+                response.getWriter()
+                                .write(
+                                                objectMapper.writeValueAsString(error));
         }
 
-        if(email != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+        private String extrairToken(HttpServletRequest request) {
 
-            var usuario = usuarioRepository
-                    .findByEmail(email)
-                    .orElse(null);
+                String authHeader = request.getHeader("Authorization");
 
-            if(usuario != null) {
+                if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                        return null;
+                }
+
+                return authHeader.substring(7);
+        }
+
+        private void autenticarUsuario(
+                        String email,
+                        HttpServletRequest request) {
+
+                if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                        return;
+                }
+
+                var usuario = usuarioRepository
+                                .findByEmail(email)
+                                .orElse(null);
+
+                if (usuario == null) {
+                        return;
+                }
 
                 User userDetails = (User) User
-                        .withUsername(usuario.getEmail())
-                        .password(usuario.getSenha())
-                        .roles(usuario.getRole().name())
-                        .build();
+                                .withUsername(usuario.getEmail())
+                                .password(usuario.getSenha())
+                                .roles(usuario.getRole().name())
+                                .build();
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                userDetails.getAuthorities()
-                        );
+                                userDetails.getAuthorities());
 
                 authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
+                                new WebAuthenticationDetailsSource()
+                                                .buildDetails(request));
 
                 SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authentication);
-            }
-
+                                .getContext()
+                                .setAuthentication(authentication);
         }
-        filterChain.doFilter(request, response);
-
-    }
-
-    private void enviarErro(
-            HttpServletResponse response,
-            String mensagem,
-            ErrorCode code
-
-    ) throws IOException {
-
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        ErrorResponseDTO error =
-                new ErrorResponseDTO(
-                        mensagem,
-                        code,
-                        401,
-                        LocalDateTime.now()
-                );
-
-        response.getWriter()
-                .write(
-                        objectMapper.writeValueAsString(error)
-                );
-    }
 }
