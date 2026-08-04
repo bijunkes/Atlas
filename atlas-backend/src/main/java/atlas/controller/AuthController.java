@@ -1,11 +1,15 @@
 package atlas.controller;
 
 import atlas.dto.*;
+import atlas.dto.usuario.UsuarioResponseDTO;
 import atlas.entity.Usuario;
 import atlas.exception.ResourceNotFoundException;
+import atlas.security.CookieService;
 import atlas.service.AuthService;
 
 import atlas.service.EmailService;
+import atlas.service.UsuarioService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +26,8 @@ import java.util.UUID;
 public class AuthController {
 
         private final AuthService authService;
+        private final CookieService cookieService;
+        private final UsuarioService usuarioService;
 
         @PostMapping("/register")
         public ResponseEntity<?> register(
@@ -35,12 +41,25 @@ public class AuthController {
         }
 
         @PostMapping("/login")
-        public ResponseEntity<AuthResponseDTO> login(
-                        @Valid @RequestBody LoginDTO dados) {
+        public ResponseEntity<UsuarioResponseDTO> login(
+                @Valid @RequestBody LoginDTO dados,
+                HttpServletResponse response) {
+
+                AuthResponseDTO auth = authService.login(dados);
+
+                cookieService.criarAccessToken(
+                        response,
+                        auth.getAccessToken()
+                );
+
+                cookieService.criarRefreshToken(
+                        response,
+                        auth.getRefreshToken()
+                );
 
                 return ResponseEntity.ok(
-                                authService.login(dados));
-
+                        UsuarioResponseDTO.fromEntity(auth.getUsuario())
+                );
         }
 
         @PostMapping("/recuperar-senha")

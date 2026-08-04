@@ -22,11 +22,9 @@ public class TokenService {
                 RefreshToken refreshToken = refreshTokenService.criar(usuario);
 
                 return new AuthResponseDTO(
-                                accessToken,
-                                refreshToken.getToken(),
-                                usuario.getId(),
-                                usuario.getNome(),
-                                usuario.getEmail(),
-                                usuario.getRole().name());
+                        accessToken,
+                        refreshToken.getToken(),
+                        usuario
+                );
         }
 }

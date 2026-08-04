@@ -21,6 +21,16 @@ public class GlobalExceptionHandler {
                                 e.getMessage());
         }
 
+        @ExceptionHandler(SocialLoginException.class)
+        public ResponseEntity<ErrorResponseDTO> handleSocialLogin(
+                        SocialLoginException e) {
+
+                return buildError(
+                                HttpStatus.CONFLICT,
+                                ErrorCode.SOCIAL_LOGIN,
+                                e.getMessage());
+        }
+
         @ExceptionHandler(EmailAlreadyExistsException.class)
         public ResponseEntity<ErrorResponseDTO> handleEmailAlreadyExists(
                         EmailAlreadyExistsException e) {

@@ -100,13 +100,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         private String extrairToken(HttpServletRequest request) {
 
-                String authHeader = request.getHeader("Authorization");
-
-                if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                if (request.getCookies() == null) {
                         return null;
                 }
 
-                return authHeader.substring(7);
+                for (var cookie : request.getCookies()) {
+
+                        if (cookie.getName().equals("accessToken")) {
+                                return cookie.getValue();
+                        }
+                }
+
+                return null;
         }
 
         private void autenticarUsuario(

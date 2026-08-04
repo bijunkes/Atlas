@@ -33,6 +33,12 @@ export const routes: Routes = [
 
   {
     path: '',
+    redirectTo: 'lp',
+    pathMatch: 'full',
+  },
+
+  {
+    path: '',
     loadComponent: () =>
       import('./features/authenticated/authenticated').then((m) => m.AuthenticatedComponent),
 
@@ -79,12 +85,6 @@ export const routes: Routes = [
         loadComponent: () => import('./features/perfil/perfil').then((m) => m.PerfilComponent),
       },
     ],
-  },
-
-  {
-    path: '',
-    redirectTo: 'lp',
-    pathMatch: 'full',
   },
 
   {

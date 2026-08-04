@@ -26,6 +26,7 @@ public class OAuth2AuthenticationSuccessHandler
 
         private final UsuarioRepository usuarioRepository;
         private final TokenService tokenService;
+        private final CookieService cookieService;
 
         @Override
         public void onAuthenticationSuccess(
@@ -33,45 +34,54 @@ public class OAuth2AuthenticationSuccessHandler
                         HttpServletResponse response,
                         Authentication authentication) throws IOException, ServletException {
 
-                OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+            OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
-                String email = oauthUser.getAttribute("email");
+            String email = oauthUser.getAttribute("email");
 
-                String nome = oauthUser.getAttribute("name");
+            String nome = oauthUser.getAttribute("name");
 
-                String googleId = oauthUser.getAttribute("sub");
+            String googleId = oauthUser.getAttribute("sub");
 
-                Usuario usuario = usuarioRepository
-                                .findByEmail(email)
-                                .map(usuarioExistente -> {
+            Usuario usuario = usuarioRepository
+                    .findByEmail(email)
+                    .map(usuarioExistente -> {
 
-                                        usuarioExistente.setGoogleId(googleId);
+                        usuarioExistente.setGoogleId(googleId);
 
-                                        if (usuarioExistente.getProvider() == AuthProvider.LOCAL) {
-                                                usuarioExistente.setProvider(AuthProvider.GOOGLE_AND_LOCAL);
-                                        }
+                        if (usuarioExistente.getProvider() == AuthProvider.LOCAL) {
+                            usuarioExistente.setProvider(AuthProvider.GOOGLE_AND_LOCAL);
+                        }
 
-                                        return usuarioRepository.save(usuarioExistente);
+                        return usuarioRepository.save(usuarioExistente);
 
-                                })
-                                .orElseGet(() -> {
+                    })
+                    .orElseGet(() -> {
 
-                                        Usuario novoUsuario = Usuario.builder()
-                                                        .nome(nome)
-                                                        .email(email)
-                                                        .googleId(googleId)
-                                                        .provider(AuthProvider.GOOGLE)
-                                                        .role(Role.USER)
-                                                        .build();
+                        Usuario novoUsuario = Usuario.builder()
+                                .nome(nome)
+                                .email(email)
+                                .googleId(googleId)
+                                .provider(AuthProvider.GOOGLE)
+                                .role(Role.USER)
+                                .build();
 
-                                        return usuarioRepository.save(novoUsuario);
-                                });
+                        return usuarioRepository.save(novoUsuario);
+                    });
 
-                AuthResponseDTO resposta = tokenService.gerarResposta(usuario);
+            AuthResponseDTO resposta = tokenService.gerarResposta(usuario);
 
-                response.sendRedirect(
-                                "http://localhost:4200/oauth/callback"
-                                                + "?accessToken=" + resposta.getAccessToken()
-                                                + "&refreshToken=" + resposta.getRefreshToken());
+            cookieService.criarAccessToken(
+                    response,
+                    resposta.getAccessToken()
+            );
+
+            cookieService.criarRefreshToken(
+                    response,
+                    resposta.getRefreshToken()
+            );
+
+            response.sendRedirect(
+                    "http://localhost:4200/dashboard"
+            );
         }
 }

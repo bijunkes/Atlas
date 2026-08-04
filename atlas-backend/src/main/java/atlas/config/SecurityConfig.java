@@ -5,14 +5,19 @@ import atlas.security.JwtAuthenticationEntryPoint;
 import atlas.security.JwtAuthenticationFilter;
 import atlas.security.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @RequiredArgsConstructor
 @Configuration
@@ -27,18 +32,26 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
                 return http
-                                .csrf(csrf -> csrf.disable())
 
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(
+                                                                CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                .ignoringRequestMatchers(
+                                                                "/auth/login",
+                                                                "/auth/register",
+                                                                "/oauth2/**",
+                                                                "/login/oauth2/**"))
                                 .cors(cors -> {
                                 })
 
-                                .sessionManagement(session -> session.sessionCreationPolicy(
-                                                SessionCreationPolicy.IF_REQUIRED))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
                                                                 "/auth/register",
                                                                 "/auth/login",
+                                                                "/auth/logout",
                                                                 "/auth/recuperar-senha",
                                                                 "/auth/resetar-senha",
                                                                 "/oauth2/**",
@@ -50,7 +63,6 @@ public class SecurityConfig {
                                 .oauth2Login(oauth2 -> oauth2
                                                 .successHandler(oauth2AuthenticationSuccessHandler)
                                                 .failureHandler((request, response, exception) -> {
-
                                                         response.sendRedirect(
                                                                         "http://localhost:4200/login");
                                                 }))

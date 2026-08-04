@@ -294,6 +294,21 @@ Tratamentos implementados:
 - Ajustes no login e recuperação de senha para lidar com diferentes tipos de conta.
 - Validação de expiração dos tokens de recuperação de senha.
 
+### 04/08/2026 — Melhorias de segurança na autenticação
+
+#### Frontend
+
+* Remoção dos tokens do `localStorage` e migração para cookies `HttpOnly`.
+* Configuração de `withCredentials` e proteção CSRF.
+* Tratamento de login para contas Google sem senha cadastrada.
+
+#### Backend
+
+* Implementação de autenticação via cookies para Access e Refresh Token.
+* Ajuste do filtro JWT para leitura dos tokens pelos cookies.
+* Configuração de CSRF no Spring Security.
+* Criação do tratamento de erro `SOCIAL_LOGIN` para contas autenticadas via Google.
+
 ---
 
 ## Desenvolvido por

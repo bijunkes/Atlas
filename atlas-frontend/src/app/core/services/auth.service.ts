@@ -1,19 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { LoginRequest, AuthResponse, RegisterRequest } from '../models/auth.model';
+import { catchError, Observable, of, tap } from 'rxjs';
+import { LoginRequest, RegisterRequest } from '../models/auth.model';
 
-import { jwtDecode } from 'jwt-decode';
 import { Usuario } from '../models/usuario.model';
 import { UserStateService } from './user-state.service';
 import { UsuarioService } from './usuario.service';
-
-interface JwtPayload {
-  exp: number;
-  sub: string;
-  id: number;
-  role: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -25,71 +17,27 @@ export class AuthService {
 
   private apiUrl = 'http://localhost:8080/auth';
 
-  private readonly ACCESS_TOKEN_KEY = 'accessToken';
-  private readonly REFRESH_TOKEN_KEY = 'refreshToken';
-
-  login(dados: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, dados).pipe(
-      tap((response) => {
-        this.salvarSessao(response);
-      }),
-    );
+  login(dados: LoginRequest): Observable<Usuario> {
+    return this.http.post<Usuario>(`${this.apiUrl}/login`, dados);
   }
 
   register(dados: RegisterRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, dados);
   }
 
-  logout() {
-    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
-
-    this.userState.clearUsuario();
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  logout(): void {
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe({
+      complete: () => {
+        this.userState.clearUsuario();
+      },
+      error: () => {
+        this.userState.clearUsuario();
+      },
+    });
   }
 
   isAuthenticated(): boolean {
-    const token = this.getToken();
-
-    if (!token) {
-      return false;
-    }
-
-    try {
-      const payload = jwtDecode<JwtPayload>(token);
-
-      if (!payload.exp) {
-        return false;
-      }
-
-      const agora = Math.floor(Date.now() / 1000);
-
-      return payload.exp > agora;
-    } catch {
-      return false;
-    }
-  }
-
-  salvarSessao(resposta: AuthResponse) {
-    this.salvarAccessToken(resposta.accessToken);
-    this.salvarRefreshToken(resposta.refreshToken);
-  }
-
-  salvarTokens(accessToken: string, refreshToken: string): void {
-    localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
-
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
-  }
-
-  private salvarAccessToken(token: string) {
-    localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
-  }
-
-  private salvarRefreshToken(token: string) {
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, token);
+    return this.userState.usuario() !== null;
   }
 
   carregarUsuarioLogado(): Observable<Usuario> {
@@ -100,23 +48,26 @@ export class AuthService {
     );
   }
 
-  inicializarSessao(): void {
-    if (!this.isAuthenticated()) {
-      return;
-    }
-
-    this.carregarUsuarioLogado().subscribe({
-      error: () => {
-        this.logout();
-      },
-    });
+  inicializarSessao(): Observable<Usuario | null> {
+    return this.carregarUsuarioLogado().pipe(
+      catchError(() => {
+        this.userState.clearUsuario();
+        return of(null);
+      }),
+    );
   }
 
   recuperarSenha(email: string) {
-    return this.http.post(`${this.apiUrl}/recuperar-senha`, { email });
+    return this.http.post(`${this.apiUrl}/recuperar-senha`, {
+      email,
+    });
   }
 
   resetarSenha(dados: { token: string; novaSenha: string }) {
     return this.http.post(`${this.apiUrl}/resetar-senha`, dados);
+  }
+
+  usuarioAtual() {
+    return this.userState.usuario();
   }
 }

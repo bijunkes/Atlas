@@ -16,7 +16,6 @@ import { FooterComponent } from './components/footer/footer';
     CtaComponent,
     FooterComponent
   ],
-  templateUrl: './landing.html',
-  styleUrl: './landing.css',
+  templateUrl: './landing.html'
 })
 export class LandingComponent {}
