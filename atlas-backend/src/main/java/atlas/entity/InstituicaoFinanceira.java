@@ -28,6 +28,7 @@ public class InstituicaoFinanceira {
 
     private String logo;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
 

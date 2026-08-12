@@ -309,6 +309,39 @@ Tratamentos implementados:
 * Configuração de CSRF no Spring Security.
 * Criação do tratamento de erro `SOCIAL_LOGIN` para contas autenticadas via Google.
 
+### 10/08/2026 — Autenticação e CSRF
+
+#### Frontend
+* Configuração de cookies e withCredentials.
+* Configuração do XSRF-TOKEN no Angular.
+* Início dos testes de autenticação pelo navegador.
+
+#### Backend
+* Configuração do CSRF com CookieCsrfTokenRepository.
+* Criação do endpoint /csrf.
+* Ajuste do CORS para permitir credenciais.
+* Investigação dos erros 403 ACCESS_DENIED.
+
+### 11/08/2026 — Testes de autenticação
+
+#### Frontend
+* Teste do /csrf pelo Angular.
+* Confirmação do recebimento do XSRF-TOKEN.
+* Preparação dos testes do /contas pelo frontend.
+
+#### Backend
+
+* Ajuste do caminho do cookie CSRF.
+* Validação da geração do XSRF-TOKEN.
+* Investigação da integração entre JWT, cookies e CSRF.
+
+### 12/08/2026 — Tela de contas
+
+#### Frontend
+* Implementação da tela de contas com listagem, saldo total e estados de carregamento/erro.
+* Criação dos modais de criar, editar e desativar contas.
+* Integração com ContaService e InstituicaoFinanceiraService.
+* Implementação de validações dinâmicas conforme o tipo de conta.
 ---
 
 ## Desenvolvido por

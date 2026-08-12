@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import org.springframework.stereotype.Component;
@@ -130,9 +131,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         return;
                 }
 
-                User userDetails = (User) User
+                UserDetails userDetails = User
                                 .withUsername(usuario.getEmail())
-                                .password(usuario.getSenha())
+                                .password("")
                                 .roles(usuario.getRole().name())
                                 .build();
 

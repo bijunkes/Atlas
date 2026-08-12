@@ -34,6 +34,9 @@ public class Conta {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal saldoInicial;
 
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal saldoAtual;
+
     private String numeroAgencia;
     private String numeroConta;
 
@@ -69,5 +72,28 @@ public class Conta {
     @JsonManagedReference
     @Builder.Default
     private List<Recorrencia> recorrencias = new ArrayList<>();
+
+    @PrePersist
+    protected void aoCriar() {
+        criadaEm = LocalDateTime.now();
+        atualizadoEm = LocalDateTime.now();
+
+        if (saldoInicial == null) {
+            saldoInicial = BigDecimal.ZERO;
+        }
+
+        if (saldoAtual == null) {
+            saldoAtual = saldoInicial;
+        }
+
+        if (ativo == null) {
+            ativo = true;
+        }
+    }
+
+    @PreUpdate
+    protected void aoAtualizar() {
+        atualizadoEm = LocalDateTime.now();
+    }
 
 }

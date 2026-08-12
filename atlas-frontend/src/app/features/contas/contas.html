@@ -1,1 +1,475 @@
-<h1>Contas</h1>
+<div class="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-0">
+
+    <!-- Cabeçalho -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-foreground">
+                Contas
+            </h1>
+
+            <p class="mt-1 text-sm text-muted">
+                Gerencie suas contas e acompanhe seus saldos.
+            </p>
+        </div>
+
+        <button type="button" (click)="abrirModalNovaConta()"
+            class="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition-colors duration-200 hover:bg-primary-hover">
+            <lucide-angular [img]="icons.Plus" class="h-4 w-4" />
+
+            Nova conta
+        </button>
+    </div>
+
+    <!-- Saldo total -->
+    <section class="relative overflow-hidden rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm text-muted">
+                    Saldo total
+                </p>
+
+                <p class="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+                    {{ formatarMoeda(saldoTotal()) }}
+                </p>
+
+                <p class="mt-2 text-xs text-muted">
+                    {{ contasAtivas() }}
+                    {{ contasAtivas() === 1 ? 'conta ativa' : 'contas ativas' }}
+                </p>
+            </div>
+
+            <div
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
+                <lucide-angular [img]="icons.Wallet" class="h-5 w-5 text-primary" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Lista de contas -->
+    <section>
+        <h2 class="mb-4 text-sm font-bold text-foreground">
+            Suas contas
+        </h2>
+
+        @if (carregando()) {
+
+        <!-- Skeleton loading -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            @for (item of [1, 2, 3, 4]; track item) {
+            <div class="animate-pulse rounded-2xl border border-border bg-surface p-5">
+
+                <div class="flex items-start justify-between">
+                    <div class="h-10 w-10 rounded-xl bg-surface-hover"></div>
+                    <div class="h-8 w-8 rounded-lg bg-surface-hover"></div>
+                </div>
+
+                <div class="mt-4 space-y-2">
+                    <div class="h-3 w-24 rounded bg-surface-hover"></div>
+                    <div class="h-2.5 w-16 rounded bg-surface-hover"></div>
+                </div>
+
+                <div class="mt-5 h-5 w-28 rounded bg-surface-hover"></div>
+            </div>
+            }
+        </div>
+
+        } @else if (erro()) {
+
+        <!-- Error state -->
+        <div
+            class="flex flex-col items-center justify-center rounded-2xl border border-border bg-surface px-6 py-16 text-center">
+
+            <div
+                class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/10">
+                <lucide-angular [img]="icons.AlertTriangle" class="h-6 w-6 text-red-400" />
+            </div>
+
+            <p class="text-base font-bold text-foreground">
+                Não foi possível carregar suas contas.
+            </p>
+
+            <p class="mt-1.5 text-sm text-muted">
+                Tente novamente.
+            </p>
+
+            <button type="button" (click)="carregarContas()"
+                class="mt-6 rounded-xl border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-surface-hover">
+                Tentar novamente
+            </button>
+        </div>
+
+        } @else if (contas().length === 0) {
+
+        <!-- Empty state -->
+        <div
+            class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-surface/50 px-6 py-16 text-center">
+
+            <div
+                class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
+                <lucide-angular [img]="icons.Wallet" class="h-6 w-6 text-primary" />
+            </div>
+
+            <p class="text-base font-bold text-foreground">
+                Você ainda não possui contas
+            </p>
+
+            <p class="mt-1.5 max-w-sm text-sm text-muted">
+                Adicione sua primeira conta para começar a acompanhar suas finanças.
+            </p>
+
+            <button type="button" (click)="abrirModalNovaConta()"
+                class="mt-6 flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition-colors duration-200 hover:bg-primary-hover">
+                <lucide-angular [img]="icons.Plus" class="h-4 w-4" />
+
+                Criar primeira conta
+            </button>
+        </div>
+
+        } @else {
+
+        <!-- Grid de contas -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+            @for (conta of contas(); track conta.id) {
+
+            <div
+                class="fade-in relative rounded-2xl border border-border bg-surface p-5 transition-colors duration-200 hover:bg-surface-hover">
+
+                <div class="flex items-start justify-between">
+
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background">
+                        <lucide-angular [img]="iconePorTipo(conta.tipo)" class="h-5 w-5 text-primary" />
+                    </div>
+
+                    <div class="relative">
+
+                        <button type="button" (click)="alternarMenu(conta.id, $event)"
+                            class="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors duration-200 hover:bg-white/[0.06] hover:text-foreground"
+                            [attr.aria-expanded]="menuAberto() === conta.id" aria-label="Ações da conta">
+                            <lucide-angular [img]="icons.MoreVertical" class="h-4 w-4" />
+                        </button>
+
+                        @if (menuAberto() === conta.id) {
+
+                        <div role="menu"
+                            class="fade-in absolute right-0 top-9 z-20 w-48 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-2xl">
+
+                            <button type="button" role="menuitem" (click)="editarConta(conta)"
+                                class="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm text-foreground transition-colors duration-200 hover:bg-white/[0.05]">
+                                <lucide-angular [img]="icons.Pencil" class="h-3.5 w-3.5 text-muted" />
+
+                                Editar conta
+                            </button>
+
+                            <button type="button" role="menuitem" (click)="verDetalhes(conta)"
+                                class="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm text-foreground transition-colors duration-200 hover:bg-white/[0.05]">
+                                <lucide-angular [img]="icons.Eye" class="h-3.5 w-3.5 text-muted" />
+
+                                Ver detalhes
+                            </button>
+
+                            <div class="my-1 border-t border-border"></div>
+
+                            <button type="button" role="menuitem" (click)="confirmarDesativacao(conta)"
+                                class="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm text-muted transition-colors duration-200 hover:bg-white/[0.05] hover:text-foreground">
+                                <lucide-angular [img]="icons.Power" class="h-3.5 w-3.5" />
+
+                                Desativar conta
+                            </button>
+
+                        </div>
+                        }
+
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-sm font-bold text-foreground">
+                        {{ conta.nome }}
+                    </p>
+
+                    <p class="text-xs text-muted">
+                        {{ rotuloTipo(conta.tipo) }}
+                    </p>
+                </div>
+
+                <p class="mt-4 text-xl font-extrabold tracking-tight text-foreground">
+                    {{ formatarMoeda(conta.saldoAtual) }}
+                </p>
+
+            </div>
+            }
+
+        </div>
+        }
+
+    </section>
+
+</div>
+
+
+<!-- Backdrop para fechar o menu de ações ao clicar fora -->
+@if (menuAberto() !== null) {
+<div class="fixed inset-0 z-10" (click)="fecharMenu()"></div>
+}
+
+
+<!-- Modal: nova conta / editar conta -->
+@if (modalAberto()) {
+
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8" role="dialog" aria-modal="true"
+    aria-labelledby="titulo-modal-conta">
+
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="fecharModal()"></div>
+
+    <div
+        class="relative z-10 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-border bg-surface px-6 py-7 shadow-2xl sm:px-8 sm:py-8">
+
+        <button type="button" (click)="fecharModal()" [disabled]="enviando()"
+            class="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors duration-200 hover:bg-white/[0.06] hover:text-foreground"
+            aria-label="Fechar">
+            <lucide-angular [img]="icons.X" class="h-4 w-4" />
+        </button>
+
+        <div class="mb-6">
+
+            <h2 id="titulo-modal-conta" class="text-2xl font-bold tracking-tight text-foreground">
+                {{ contaEmEdicao() ? 'Editar conta' : 'Nova conta' }}
+            </h2>
+
+            <p class="mt-1 text-sm text-muted">
+                @if (contaEmEdicao()) {
+                Atualize as informações da sua conta.
+                } @else {
+                Adicione uma conta para começar a acompanhar suas finanças.
+                }
+            </p>
+
+        </div>
+
+        <form [formGroup]="formulario" (ngSubmit)="salvar()" class="space-y-4">
+
+            <!-- Nome -->
+            <div>
+
+                <label for="nome" class="mb-1.5 block text-xs font-medium text-muted">
+                    Nome da conta
+                </label>
+
+                <div class="flex items-center gap-3 rounded-xl border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                    [class.border-red-500]="formulario.controls.nome.invalid && formulario.controls.nome.touched"
+                    [class.border-border]="!(formulario.controls.nome.invalid && formulario.controls.nome.touched)">
+
+                    <input id="nome" type="text" formControlName="nome" placeholder="Ex: Nubank"
+                        class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
+
+                </div>
+
+            </div>
+
+
+            <!-- Tipo -->
+            <div>
+
+                <label for="tipo" class="mb-1.5 block text-xs font-medium text-muted">
+                    Tipo
+                </label>
+
+                <div
+                    class="rounded-xl border border-border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+
+                    <select id="tipo" formControlName="tipo"
+                        class="w-full appearance-none bg-transparent text-sm text-foreground outline-none">
+                        @for (tipo of tiposConta; track tipo) {
+                        <option [ngValue]="tipo" class="bg-surface text-foreground">
+                            {{ rotuloTipo(tipo) }}
+                        </option>
+                        }
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- Instituição financeira -->
+            @if (mostrarInstituicao) {
+
+            <div>
+
+                <label for="instituicaoId" class="mb-1.5 block text-xs font-medium text-muted">
+                    Instituição financeira
+                </label>
+
+                <div class="flex items-center gap-3 rounded-xl border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                    [class.border-red-500]="formulario.controls.instituicaoId.invalid && formulario.controls.instituicaoId.touched"
+                    [class.border-border]="!(formulario.controls.instituicaoId.invalid && formulario.controls.instituicaoId.touched)">
+
+                    <select id="instituicaoId" formControlName="instituicaoId"
+                        class="w-full appearance-none bg-transparent text-sm text-foreground outline-none">
+                        <option [ngValue]="null" class="bg-surface text-muted">
+                            Selecione uma instituição
+                        </option>
+
+                        @for (instituicao of instituicoes(); track instituicao.id) {
+                        <option [ngValue]="instituicao.id" class="bg-surface text-foreground">
+                            {{ instituicao.nome }}
+                        </option>
+                        }
+                    </select>
+
+                </div>
+
+            </div>
+
+            }
+
+
+            <!-- Agência e conta -->
+            @if (mostrarAgenciaConta) {
+
+            <div class="grid grid-cols-2 gap-3">
+
+                <!-- Agência -->
+                <div>
+
+                    <label for="numeroAgencia" class="mb-1.5 block text-xs font-medium text-muted">
+                        Agência
+                    </label>
+
+                    <div
+                        class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+
+                        <input id="numeroAgencia" type="text" formControlName="numeroAgencia" placeholder="0001"
+                            class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
+
+                    </div>
+
+                </div>
+
+
+                <!-- Número da conta -->
+                <div>
+
+                    <label for="numeroConta" class="mb-1.5 block text-xs font-medium text-muted">
+                        Número da conta
+                    </label>
+
+                    <div
+                        class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+
+                        <input id="numeroConta" type="text" formControlName="numeroConta" placeholder="00000-0"
+                            class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            }
+
+
+            <!-- Saldo inicial -->
+            <div>
+
+                <label for="saldoInicial" class="mb-1.5 block text-xs font-medium text-muted">
+                    Saldo inicial
+                </label>
+
+                <div class="flex items-center gap-3 rounded-xl border bg-background px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                    [class.border-red-500]="formulario.controls.saldoInicial.invalid && formulario.controls.saldoInicial.touched"
+                    [class.border-border]="!(formulario.controls.saldoInicial.invalid && formulario.controls.saldoInicial.touched)">
+
+                    <span class="text-sm text-muted">
+                        R$
+                    </span>
+
+                    <input id="saldoInicial" type="number" step="0.01" formControlName="saldoInicial" placeholder="0,00"
+                        class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
+
+                </div>
+
+            </div>
+
+
+            <!-- Botões -->
+            <div class="flex gap-3 pt-2">
+
+                <button type="button" (click)="fecharModal()" [disabled]="enviando()"
+                    class="flex-1 rounded-xl border border-border py-3 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60">
+                    Cancelar
+                </button>
+
+                <button type="submit" [disabled]="enviando()"
+                    class="flex-1 rounded-xl bg-primary py-3 text-sm font-bold text-black transition-colors duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70">
+
+                    @if (enviando()) {
+                    {{ contaEmEdicao() ? 'Salvando...' : 'Criando...' }}
+                    } @else {
+                    {{ contaEmEdicao() ? 'Salvar alterações' : 'Criar conta' }}
+                    }
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+}
+
+
+<!-- Modal: confirmação de desativação -->
+@if (contaParaDesativar(); as conta) {
+
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true"
+    aria-labelledby="titulo-modal-desativar">
+
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="cancelarDesativacao()"></div>
+
+    <div class="relative z-10 w-full max-w-sm rounded-3xl border border-border bg-surface px-8 py-8 shadow-2xl">
+
+        <div class="mb-6 flex flex-col items-center text-center">
+
+            <div
+                class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/10">
+                <lucide-angular [img]="icons.Power" class="h-5 w-5 text-red-400" />
+            </div>
+
+            <h2 id="titulo-modal-desativar" class="text-xl font-bold tracking-tight text-foreground">
+                Desativar conta
+            </h2>
+
+            <p class="mt-1.5 text-sm text-muted">
+                Tem certeza que deseja desativar
+                <span class="font-semibold text-foreground">
+                    {{ conta.nome }}
+                </span>?
+
+                Você poderá reativá-la depois.
+            </p>
+
+        </div>
+
+        <div class="flex gap-3">
+
+            <button type="button" (click)="cancelarDesativacao()" [disabled]="desativando()"
+                class="flex-1 rounded-xl border border-border py-3 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60">
+                Cancelar
+            </button>
+
+            <button type="button" (click)="desativarConta()" [disabled]="desativando()"
+                class="flex-1 rounded-xl border border-red-500/30 bg-red-500/10 py-3 text-sm font-bold text-red-400 transition-colors duration-200 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-70">
+                {{ desativando() ? 'Desativando...' : 'Desativar' }}
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+}

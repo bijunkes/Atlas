@@ -16,9 +16,7 @@ export class OAuthCallbackComponent implements OnInit {
       next: () => {
         this.router.navigate(['/dashboard']);
       },
-
       error: () => {
-        this.authService.logout();
         this.router.navigate(['/login']);
       },
     });

@@ -31,16 +31,24 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+                CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+
+                csrfTokenRepository.setCookiePath("/");
+
                 return http
 
                                 .csrf(csrf -> csrf
-                                                .csrfTokenRepository(
-                                                                CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                .csrfTokenRepository(csrfTokenRepository)
                                                 .ignoringRequestMatchers(
                                                                 "/auth/login",
                                                                 "/auth/register",
+                                                                "/auth/logout",
+                                                                "/auth/recuperar-senha",
+                                                                "/auth/resetar-senha",
                                                                 "/oauth2/**",
-                                                                "/login/oauth2/**"))
+                                                                "/login/oauth2/**",
+                                                        "/contas/**"))
+
                                 .cors(cors -> {
                                 })
 
@@ -55,7 +63,8 @@ public class SecurityConfig {
                                                                 "/auth/recuperar-senha",
                                                                 "/auth/resetar-senha",
                                                                 "/oauth2/**",
-                                                                "/login/oauth2/**")
+                                                                "/login/oauth2/**",
+                                                                "/csrf")
                                                 .permitAll()
 
                                                 .anyRequest().authenticated())

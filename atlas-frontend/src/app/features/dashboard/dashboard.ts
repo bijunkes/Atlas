@@ -1,7 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-
-import { SidebarComponent } from '../../shared/sidebar/sidebar';
+import { HttpClient } from '@angular/common/http';
 import { UserStateService } from '../../core/services/user-state.service';
 
 @Component({
@@ -13,6 +11,8 @@ import { UserStateService } from '../../core/services/user-state.service';
 })
 export class DashboardComponent {
   private readonly userState = inject(UserStateService);
+  private readonly http = inject(HttpClient);
 
   protected readonly usuario = this.userState.usuario;
+
 }

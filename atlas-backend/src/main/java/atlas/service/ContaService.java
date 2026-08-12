@@ -5,6 +5,7 @@ import atlas.dto.conta.ContaResponseDTO;
 import atlas.entity.Conta;
 import atlas.entity.InstituicaoFinanceira;
 import atlas.entity.Usuario;
+import atlas.enums.TipoConta;
 import atlas.exception.ResourceNotFoundException;
 import atlas.repository.ContaRepository;
 import atlas.repository.InstituicaoFinanceiraRepository;
@@ -25,25 +26,19 @@ public class ContaService {
 
                 Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-                InstituicaoFinanceira instituicao = null;
-
-                if (dados.instituicaoId() != null) {
-
-                        instituicao = instituicaoRepository.findById(dados.instituicaoId())
-                                        .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Instituição não encontrada"));
-                }
+                InstituicaoFinanceira instituicao = buscarInstituicao(dados);
 
                 Conta conta = Conta.builder()
-                                .usuario(usuario)
-                                .instituicao(instituicao)
-                                .nome(dados.nome())
-                                .tipo(dados.tipo())
-                                .saldoInicial(dados.saldoInicial())
-                                .numeroAgencia(dados.numeroAgencia())
-                                .numeroConta(dados.numeroConta())
-                                .ativo(true)
-                                .build();
+                        .usuario(usuario)
+                        .instituicao(instituicao)
+                        .nome(dados.nome())
+                        .tipo(dados.tipo())
+                        .saldoInicial(dados.saldoInicial())
+                        .saldoAtual(dados.saldoInicial())
+                        .numeroAgencia(dados.numeroAgencia())
+                        .numeroConta(dados.numeroConta())
+                        .ativo(true)
+                        .build();
 
                 contaRepository.save(conta);
 
@@ -65,9 +60,10 @@ public class ContaService {
 
                 Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-                Conta conta = contaRepository.findByIdAndUsuario(id, usuario)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Conta não encontrada"));
+                Conta conta = contaRepository
+                        .findByIdAndUsuarioAndAtivoTrue(id, usuario)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Conta não encontrada"));
 
                 return toResponse(conta);
         }
@@ -75,32 +71,28 @@ public class ContaService {
         private ContaResponseDTO toResponse(Conta conta) {
 
                 return new ContaResponseDTO(
-                                conta.getId(),
-                                conta.getNome(),
-                                conta.getTipo(),
-                                conta.getSaldoInicial(),
-                                conta.getInstituicao() != null
-                                                ? conta.getInstituicao().getNome()
-                                                : null,
-                                conta.getAtivo());
+                        conta.getId(),
+                        conta.getNome(),
+                        conta.getTipo(),
+                        conta.getSaldoAtual(),
+                        conta.getInstituicao() != null
+                                ? conta.getInstituicao().getNome()
+                                : null,
+                        conta.getAtivo()
+                );
         }
 
         public ContaResponseDTO atualizar(Long id, ContaRequestDTO dados) {
 
                 Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-                Conta conta = contaRepository.findByIdAndUsuario(id, usuario)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Conta não encontrada"));
+                Conta conta = contaRepository
+                        .findByIdAndUsuarioAndAtivoTrue(id, usuario)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Conta não encontrada"));
 
-                InstituicaoFinanceira instituicao = null;
-
-                if (dados.instituicaoId() != null) {
-
-                        instituicao = instituicaoRepository.findById(dados.instituicaoId())
-                                        .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Instituição não encontrada"));
-                }
+                InstituicaoFinanceira instituicao = buscarInstituicao(dados);
 
                 conta.setNome(dados.nome());
                 conta.setTipo(dados.tipo());
@@ -117,7 +109,7 @@ public class ContaService {
 
                 Usuario usuario = usuarioAutenticadoService.getUsuarioLogado();
 
-                Conta conta = contaRepository.findByIdAndUsuario(id, usuario)
+                Conta conta = contaRepository.findByIdAndUsuarioAndAtivoTrue(id, usuario)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Conta não encontrada"));
 
@@ -137,5 +129,24 @@ public class ContaService {
                 conta.setAtivo(true);
 
                 contaRepository.save(conta);
+        }
+
+        private InstituicaoFinanceira buscarInstituicao(ContaRequestDTO dados) {
+
+                if (dados.tipo() == TipoConta.CARTEIRA
+                        && dados.instituicaoId() == null) {
+                        return null;
+                }
+
+                if (dados.instituicaoId() == null) {
+                        throw new IllegalArgumentException(
+                                "A instituição é obrigatória para este tipo de conta");
+                }
+
+                return instituicaoRepository
+                        .findById(dados.instituicaoId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Instituição não encontrada"));
         }
 }
