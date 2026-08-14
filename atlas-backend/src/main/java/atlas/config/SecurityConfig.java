@@ -46,8 +46,7 @@ public class SecurityConfig {
                                                                 "/auth/recuperar-senha",
                                                                 "/auth/resetar-senha",
                                                                 "/oauth2/**",
-                                                                "/login/oauth2/**",
-                                                        "/contas/**"))
+                                                                "/login/oauth2/**"))
 
                                 .cors(cors -> {
                                 })
@@ -55,19 +54,22 @@ public class SecurityConfig {
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(
-                                                                "/auth/register",
-                                                                "/auth/login",
-                                                                "/auth/logout",
-                                                                "/auth/recuperar-senha",
-                                                                "/auth/resetar-senha",
-                                                                "/oauth2/**",
-                                                                "/login/oauth2/**",
-                                                                "/csrf")
-                                                .permitAll()
+                        .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(
+                                        "/auth/register",
+                                        "/auth/login",
+                                        "/auth/logout",
+                                        "/auth/recuperar-senha",
+                                        "/auth/resetar-senha",
+                                        "/oauth2/**",
+                                        "/login/oauth2/**",
+                                        "/csrf"
+                                ).permitAll()
 
-                                                .anyRequest().authenticated())
+                                .requestMatchers("/contas/**").authenticated()
+
+                                .anyRequest().authenticated()
+                        )
 
                                 .oauth2Login(oauth2 -> oauth2
                                                 .successHandler(oauth2AuthenticationSuccessHandler)

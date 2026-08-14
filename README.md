@@ -342,6 +342,16 @@ Tratamentos implementados:
 * Criação dos modais de criar, editar e desativar contas.
 * Integração com ContaService e InstituicaoFinanceiraService.
 * Implementação de validações dinâmicas conforme o tipo de conta.
+
+### 13/08/2026 — Correção do CSRF
+
+#### Frontend
+
+* Correção do erro 403 Forbidden ao realizar requisições POST, PUT, PATCH e DELETE.
+* Correção do gerenciamento e envio do token CSRF entre Angular e Spring Security.
+* Ajuste do CsrfService e csrfInterceptor para utilizar o token correto.
+* Validação das requisições POST após a correção.
+
 ---
 
 ## Desenvolvido por
